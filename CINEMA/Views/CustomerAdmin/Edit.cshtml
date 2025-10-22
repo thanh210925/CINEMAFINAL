@@ -4,30 +4,73 @@
     Layout = "_AdminLayout";
 }
 
-<h2 class="fw-bold mb-4">✏️ Sửa khách hàng</h2>
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <h2 class="fw-bold mb-0 text-primary">
+            <i class="bi bi-pencil-square me-2"></i> Sửa thông tin khách hàng
+        </h2>
+    </div>
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="CustomerId" />
-    <div class="mb-3">
-        <label class="form-label">Họ tên</label>
-        <input asp-for="FullName" class="form-control" />
+    <!-- Form -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="CustomerId" />
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-person-fill me-1 text-secondary"></i> Họ tên
+                        </label>
+                        <input asp-for="FullName" class="form-control form-control-lg" placeholder="Nhập họ tên..." />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-envelope-fill me-1 text-secondary"></i> Email
+                        </label>
+                        <input asp-for="Email" class="form-control form-control-lg" readonly />
+                        <small class="text-muted">Email không thể thay đổi</small>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-telephone-fill me-1 text-secondary"></i> Số điện thoại
+                        </label>
+                        <input asp-for="Phone" class="form-control form-control-lg" placeholder="0123456789" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-gender-ambiguous me-1 text-secondary"></i> Giới tính
+                        </label>
+                        <select asp-for="Gender" class="form-select form-select-lg">
+                            <option value="">-- Chọn giới tính --</option>
+                            <option value="Nam" selected="@(Model.Gender == "Nam")">Nam</option>
+                            <option value="Nữ" selected="@(Model.Gender == "Nữ")">Nữ</option>
+                            <option value="Khác" selected="@(Model.Gender == "Khác")">Khác</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-calendar-heart me-1 text-secondary"></i> Ngày sinh
+                        </label>
+                        <input asp-for="BirthDate" class="form-control form-control-lg" type="date" />
+                    </div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg px-4">
+                        <i class="bi bi-check-circle-fill me-2"></i> Cập nhật
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="bi bi-x-circle me-2"></i> Hủy
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Email</label>
-        <input asp-for="Email" class="form-control" readonly />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Số điện thoại</label>
-        <input asp-for="Phone" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Giới tính</label>
-        <input asp-for="Gender" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Ngày sinh</label>
-        <input asp-for="BirthDate" class="form-control" type="date" />
-    </div>
-    <button type="submit" class="btn btn-primary">Cập nhật</button>
-    <a asp-action="Index" class="btn btn-secondary">Hủy</a>
-</form>
+</div>

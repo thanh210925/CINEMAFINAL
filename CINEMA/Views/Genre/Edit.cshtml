@@ -1,0 +1,38 @@
+﻿@model CINEMA.Models.Genre
+@{
+    ViewData["Title"] = "Chỉnh sửa Thể loại";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold text-warning mb-3">✏ Chỉnh sửa Thể loại</h2>
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="GenreId" />
+
+        <div class="mb-3">
+            <label class="form-label">Tên thể loại</label>
+            <input asp-for="Name" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Mô tả</label>
+            <textarea asp-for="Description" class="form-control"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Chọn phim thuộc thể loại này</label>
+            <select name="selectedMovies" class="form-select" multiple size="6">
+                @foreach (var movie in ViewBag.Movies)
+                {
+                    var selected = ((List<int>)ViewBag.SelectedMovies).Contains(movie.MovieId)
+                    ? "selected" : "";
+                    <option value="@movie.MovieId" selected="@selected">@movie.Title</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Cập nhật</button>
+        <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+    </form>
+</div>

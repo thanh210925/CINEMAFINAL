@@ -1,0 +1,56 @@
+﻿@model IEnumerable<CINEMA.Models.Auditorium>
+@{
+    ViewData["Title"] = "Danh sách phòng chiếu";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4 text-primary"><i class="bi bi-tv"></i> Danh sách phòng chiếu</h2>
+
+    <a asp-action="Create" class="btn btn-success mb-3">
+        <i class="bi bi-plus-circle"></i> Thêm phòng chiếu
+    </a>
+
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light text-center">
+            <tr>
+                <th>Tên phòng</th>
+                <th>Rạp</th>
+                <th>Số hàng ghế</th>
+                <th>Số ghế mỗi hàng</th>
+                <th>Loại màn hình</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var a in Model)
+            {
+                <tr class="text-center">
+                    <td>@a.Name</td>
+                    <td>@a.Theater?.Name</td>
+                    <td>@a.SeatRows</td>
+                    <td>@a.SeatCols</td>
+                    <td>@a.ScreenType</td>
+                    <td>
+                        @if (a.IsActive == true)
+                        {
+                            <span class="badge bg-success">Hoạt động</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Tạm dừng</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@a.AuditoriumId" class="btn btn-sm btn-outline-warning">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@a.AuditoriumId" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

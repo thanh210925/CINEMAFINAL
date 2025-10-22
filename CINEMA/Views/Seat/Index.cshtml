@@ -1,0 +1,50 @@
+﻿@model IEnumerable<CINEMA.Models.Seat>
+@{
+    ViewData["Title"] = "Quản lý Ghế ngồi";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold text-primary mb-3">💺 Quản lý Ghế ngồi</h2>
+    <a asp-action="Create" class="btn btn-success mb-3">➕ Thêm Ghế</a>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Mã ghế</th>
+                <th>Phòng chiếu</th>
+                <th>Hàng</th>
+                <th>Số ghế</th>
+                <th>Loại ghế</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                <tr>
+                    <td>@s.SeatId</td>
+                    <td>@s.Auditorium?.Name</td>
+                    <td>@s.RowLabel</td>
+                    <td>@s.SeatNumber</td>
+                    <td>@s.SeatType</td>
+                    <td>
+                        @if (s.IsActive == true)
+                        {
+                            <span class="badge bg-success">Hoạt động</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Ngưng</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@s.SeatId" class="btn btn-primary btn-sm">✏ Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@s.SeatId" class="btn btn-danger btn-sm">🗑 Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

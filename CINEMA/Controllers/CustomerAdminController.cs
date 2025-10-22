@@ -11,7 +11,6 @@ namespace CINEMA.Controllers
         {
             _context = context;
         }
-
         public IActionResult Index()
         {
             var customers = _context.Customers.ToList();

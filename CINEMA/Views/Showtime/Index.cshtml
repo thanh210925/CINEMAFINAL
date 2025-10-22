@@ -1,0 +1,45 @@
+﻿@model IEnumerable<CINEMA.Models.Showtime>
+@{
+    ViewData["Title"] = "Quản lý lịch chiếu";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold">📅 Quản lý lịch chiếu</h2>
+    <a asp-action="Create" class="btn btn-primary mb-3">➕ Thêm lịch chiếu</a>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Phim</th>
+                <th>Rạp</th>
+                <th>Bắt đầu</th>
+                <th>Kết thúc</th>
+                <th>Giá vé</th>
+                <th>Ngôn ngữ</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                <tr>
+                    <td>@s.Movie?.Title</td>
+                    <td>@s.Auditorium?.Name</td>
+                    <td>@s.StartTime?.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@s.EndTime?.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@s.BasePrice?.ToString("N0") đ</td>
+                    <td>@s.Language</td>
+                    <td>
+                        @(s.IsActive == true ? "Đang chiếu" : "Ngưng")
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@s.ShowtimeId" class="btn btn-sm btn-warning">✏️ Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@s.ShowtimeId" class="btn btn-sm btn-danger">🗑 Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

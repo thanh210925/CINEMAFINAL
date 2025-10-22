@@ -1,0 +1,28 @@
+﻿@model CINEMA.Models.Showtime
+@{
+    ViewData["Title"] = "Xóa lịch chiếu";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-4">
+    <h2 class="text-danger">🗑 Xóa lịch chiếu</h2>
+    <h5>Bé có chắc chắn muốn xóa lịch chiếu này không?</h5>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <p><strong>Phim:</strong> @Model.Movie?.Title</p>
+            <p><strong>Rạp:</strong> @Model.Auditorium?.Name</p>
+            <p><strong>Bắt đầu:</strong> @Model.StartTime?.ToString("dd/MM/yyyy HH:mm")</p>
+            <p><strong>Kết thúc:</strong> @Model.EndTime?.ToString("dd/MM/yyyy HH:mm")</p>
+            <p><strong>Giá vé:</strong> @Model.BasePrice?.ToString("N0") đ</p>
+            <p><strong>Ngôn ngữ:</strong> @Model.Language</p>
+            <p><strong>Trạng thái:</strong> @(Model.IsActive == true ? "Đang chiếu" : "Ngưng")</p>
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post" class="mt-3">
+        <input type="hidden" asp-for="ShowtimeId" />
+        <button type="submit" class="btn btn-danger">✅ Xác nhận xóa</button>
+        <a asp-action="Index" class="btn btn-secondary">⬅ Hủy</a>
+    </form>
+</div>

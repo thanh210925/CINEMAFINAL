@@ -3,44 +3,22 @@
     ViewData["Title"] = "Trang chủ";
 }
 
+<!-- 🏠 Banner -->
 <div class="container mt-4">
-    <h2 class="text-center mb-4">CineZone – Điểm hẹn điện ảnh của bạn</h2>
+    <h2 class="text-center mb-4 fw-bold text-gradient">🎬 CineZone – Điểm hẹn điện ảnh của bạn</h2>
 
-    <!-- Banner chạy -->
-    <div id="bannerCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
-        <!-- Dấu chấm -->
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="0" class="active"></button>
-            <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="1"></button>
-            <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="2"></button>
-        </div>
-
-        <!-- Ảnh banner -->
-        <div class="carousel-inner">
+    <div id="bannerCarousel" class="carousel slide carousel-fade shadow-sm rounded" data-bs-ride="carousel">
+        <div class="carousel-inner rounded">
             <div class="carousel-item active">
-                <img src="~/images/banner1.jpg" class="d-block w-100 banner-img" alt="Banner 1">
-                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
-                    <h5>Mua 1 tặng 1</h5>
-                    <p>Áp dụng cho vé phim 2D vào thứ 3 hàng tuần</p>
-                </div>
+                <img src="~/images/banner1.jpg" class="d-block w-100 rounded" alt="Banner 1">
             </div>
             <div class="carousel-item">
-                <img src="~/images/banner2.jpg" class="d-block w-100 banner-img" alt="Banner 2">
-                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
-                    <h5>Combo Bắp + Nước chỉ 49k</h5>
-                    <p>Khuyến mãi khi đặt vé online</p>
-                </div>
+                <img src="~/images/banner2.jpg" class="d-block w-100 rounded" alt="Banner 2">
             </div>
             <div class="carousel-item">
-                <img src="~/images/banner3.jpg" class="d-block w-100 banner-img" alt="Banner 3">
-                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
-                    <h5>Suất chiếu đặc biệt</h5>
-                    <p>Xem phim bom tấn sớm hơn 1 ngày</p>
-                </div>
+                <img src="~/images/banner3.jpg" class="d-block w-100 rounded" alt="Banner 3">
             </div>
         </div>
-
-        <!-- Nút điều hướng -->
         <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon"></span>
         </button>
@@ -50,49 +28,151 @@
     </div>
 </div>
 
-<!-- PHIM ĐANG CHIẾU -->
-<div class="container mt-5">
-    <h2 class="fw-bold text-center mb-4">🎬 PHIM ĐANG CHIẾU</h2>
-    <div class="row">
-        @if (Model != null && Model.Any())
-        {
-            foreach (var movie in Model)
-            {
-                <div class="col-md-3 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="@movie.PosterUrl" class="card-img-top" alt="@movie.Title"
-                             style="height: 350px; object-fit: cover;" />
-                        <div class="card-body text-center">
-                            <h5 class="card-title fw-bold">@movie.Title</h5>
-                            <p class="text-muted small">
-                                @movie.AgeRating | @movie.Duration phút
-                            </p>
-                            <a asp-controller="Home" asp-action="BookTicket" asp-route-id="@movie.MovieId"
-                               class="btn btn-warning fw-bold w-100">
-                                🎟 Đặt vé ngay
-                            </a>
-                        </div>
-                    </div>
+<!-- 🎟 ĐẶT VÉ NHANH -->
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h5 class="fw-bold mb-3">🎟 ĐẶT VÉ NHANH</h5>
+            <form asp-controller="Home" asp-action="BookTicket" method="post" class="row g-3 align-items-center">
+
+                <!-- Chọn phim -->
+                <div class="col-md-4">
+                    <select class="form-select" id="movieSelect" name="movieId" required>
+                        <option selected disabled>-- Chọn phim --</option>
+                        @foreach (var movie in Model)
+                        {
+                            <option value="@movie.MovieId">@movie.Title</option>
+                        }
+                    </select>
                 </div>
-            }
-        }
-        else
-        {
-            <p class="text-center text-muted">Hiện chưa có phim nào đang chiếu.</p>
-        }
+
+                <!-- Chọn ngày chiếu -->
+                <div class="col-md-3">
+                    <select class="form-select" id="dateSelect" name="date" required>
+                        <option selected disabled>-- Chọn ngày --</option>
+                    </select>
+                </div>
+
+                <!-- Chọn suất chiếu -->
+                <div class="col-md-3">
+                    <select class="form-select" id="showtimeSelect" name="showtimeId" required>
+                        <option selected disabled>-- Chọn suất chiếu --</option>
+                    </select>
+                </div>
+
+                <!-- Nút đặt vé -->
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-danger w-100 fw-bold">
+                        ĐẶT NGAY
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<!-- CSS -->
-<style>
-    .banner-img {
-        height: 400px;
-        object-fit: cover;
-    }
+<!-- 🎥 PHIM ĐANG CHIẾU -->
+<section class="container my-5">
+    <h2 class="fw-bold text-center mb-5 text-gradient">🎬 PHIM ĐANG CHIẾU</h2>
+    <div class="row g-4">
+        @foreach (var movie in Model.Where(m => m.IsActive == true))
+        {
+            <div class="col-md-3 col-sm-6">
+                <div class="movie-card shadow-sm border-0 h-100">
+                    <div class="position-relative">
+                        <img src="@movie.PosterUrl" class="card-img-top rounded-top-4" alt="@movie.Title">
+                        <div class="overlay d-flex align-items-center justify-content-center">
+                            <a asp-controller="Home" asp-action="BookTicket" asp-route-id="@movie.MovieId"
+                               class="btn btn-warning fw-bold rounded-pill px-4 py-2 shadow">
+                                🎟 Đặt vé
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="fw-bold">@movie.Title</h5>
+                        <p class="text-muted small">@movie.AgeRating | @movie.Duration phút</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
 
-    .carousel-caption h5,
-    .carousel-caption p {
-        color: #fff;
-        text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
-    }
-</style>
+<!-- 🍿 PHIM SẮP CHIẾU -->
+<section class="container my-5">
+    <h2 class="fw-bold text-center mb-5 text-gradient">🍿 PHIM SẮP CHIẾU</h2>
+    <div class="row g-4">
+        @foreach (var movie in Model.Where(m => m.IsActive == false))
+        {
+            <div class="col-md-3 col-sm-6">
+                <div class="movie-card upcoming-card h-100 shadow-sm border-0">
+                    <div class="position-relative">
+                        <img src="@movie.PosterUrl" class="card-img-top rounded-top-4" alt="@movie.Title">
+                        <div class="ribbon">COMING SOON</div>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="fw-bold">@movie.Title</h5>
+                        <p class="text-muted small">@movie.Duration phút | @movie.Country</p>
+                        <span class="badge bg-secondary">
+                            Khởi chiếu: @movie.ReleaseDate?.ToString("dd/MM/yyyy")
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- CSS -->
+<link rel="stylesheet" href="~/css/site-home.css" />
+
+@section Scripts {
+    <script>
+        const movieSelect = document.getElementById("movieSelect");
+        const dateSelect = document.getElementById("dateSelect");
+        const showtimeSelect = document.getElementById("showtimeSelect");
+
+        movieSelect.addEventListener("change", function () {
+            const movieId = this.value;
+
+            // Reset dropdown
+            dateSelect.innerHTML = '<option selected disabled>-- Chọn ngày --</option>';
+            showtimeSelect.innerHTML = '<option selected disabled>-- Chọn suất chiếu --</option>';
+
+            fetch(`/Home/GetShowtimesByMovie?movieId=${movieId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || data.length === 0) {
+                        alert("Phim này chưa có lịch chiếu!");
+                        return;
+                    }
+
+                    // Lấy danh sách ngày duy nhất
+                    const dates = [...new Set(data.map(s => s.date))];
+                    dates.forEach(d => {
+                        const opt = document.createElement("option");
+                        opt.value = d;
+                        const [y, m, day] = d.split("-");
+                        opt.textContent = `${day}/${m}/${y}`;
+                        dateSelect.appendChild(opt);
+                    });
+
+                    // Khi chọn ngày => hiển thị suất chiếu
+                    dateSelect.onchange = function () {
+                        const selectedDate = this.value;
+                        showtimeSelect.innerHTML = '<option selected disabled>-- Chọn suất chiếu --</option>';
+
+                        data.filter(s => s.date === selectedDate).forEach(s => {
+                            const opt = document.createElement("option");
+                            opt.value = s.showtimeId;
+                            opt.textContent = `${s.time} - Giá: ${Number(s.price).toLocaleString("vi-VN")}đ`;
+                            showtimeSelect.appendChild(opt);
+                        });
+                    };
+                })
+                .catch(err => console.error("❌ API error:", err));
+        });
+    </script>
+
+    <script src="~/js/home.js"></script>
+}

@@ -1,0 +1,139 @@
+﻿@model CINEMA.ViewModels.PaymentViewModel
+@using CINEMA.ViewModels // <-- ADD THIS LINE to fix 'ComboViewModel could not be found'
+@{
+    ViewData["Title"] = "Kết quả thanh toán";
+    Layout = "_Layout"; // Or your main layout
+}
+
+<div class="container mt-5 mb-5 text-center">
+    <div class="card p-4 p-md-5 shadow-sm mx-auto" style="max-width: 600px;">
+
+        @* --- Phần hiển thị trạng thái chung --- *@
+        @if (ViewBag.PaymentStatus == "Đã thanh toán")
+        {
+                <div style="font-size: 4rem; color: #198754;"><i class="bi bi-check-circle-fill"></i></div>
+                <h2 class="fw-bold text-success mt-3 mb-3">Thanh toán thành công!</h2>
+                <p class="lead">Cảm ơn bạn đã đặt vé tại CinemaZone.</p>
+        }
+        else if (ViewBag.PaymentStatus == "Chờ thanh toán")
+        {
+                 <div style="font-size: 4rem; color: #ffc107;"><i class="bi bi-hourglass-split"></i></div>
+                <h2 class="fw-bold text-warning mt-3 mb-3">Đặt vé thành công!</h2>
+                <p class="lead">Vui lòng đến quầy vé để hoàn tất thanh toán trước giờ chiếu.</p>
+        }
+        else { /* Icon Lỗi */ /* Thông báo lỗi */ }
+
+        <hr class="my-4">
+
+        @* --- Phần thông tin thanh toán cơ bản --- *@
+        @if (!string.IsNullOrEmpty(ViewBag.BookingCode))
+        {
+            <p><strong>Mã đặt vé:</strong> <span class="fw-bold text-danger fs-5 user-select-all">@ViewBag.BookingCode</span></p>
+        }
+        <p><strong>Phương thức:</strong> @ViewBag.PaymentMethod</p>
+        <p><strong>Trạng thái:</strong> <span class="fw-bold">@ViewBag.PaymentStatus</span></p>
+        <p><strong>Tổng tiền:</strong> <span class="fw-bold">@(((decimal?)ViewBag.Total ?? 0).ToString("N0")) đ</span></p>
+        @if (!string.IsNullOrEmpty(ViewBag.Message))
+        {
+            <p class="mt-3 fst-italic">@ViewBag.Message</p>
+        }
+
+
+        @* --- PHẦN HIỂN THỊ THÔNG TIN CHI TIẾT --- *@
+        <div class="card mt-4 text-start">
+             <div class="card-header bg-light fw-bold">
+                 Chi tiết đơn hàng
+             </div>
+             <div class="card-body small">
+                 @* Hiển thị thông tin khách hàng (ưu tiên ViewBag) *@
+                 @if (!string.IsNullOrEmpty(ViewBag.CustomerName))
+                {
+                         <p><strong>Khách hàng:</strong> @ViewBag.CustomerName (@ViewBag.CustomerEmail)</p>
+                         <p><strong>Điện thoại:</strong> @ViewBag.CustomerPhone</p>
+                 }
+                else if (Model != null && !string.IsNullOrEmpty(Model.CustomerName))
+                {
+                          <p><strong>Khách hàng:</strong> @Model.CustomerName (@Model.CustomerEmail)</p>
+                          <p><strong>Điện thoại:</strong> @Model.CustomerPhone</p>
+                 }
+
+                 @* Hiển thị thông tin vé (ưu tiên ViewBag) *@
+                 @if (!string.IsNullOrEmpty(ViewBag.MovieTitle))
+                {
+                         <p><strong>Phim:</strong> @ViewBag.MovieTitle</p>
+                         <p><strong>Suất chiếu:</strong> @ViewBag.Showtime</p>
+                         <p><strong>Rạp:</strong> @ViewBag.Auditorium</p>
+                 }
+                else if (Model != null && !string.IsNullOrEmpty(Model.MovieTitle))
+                {
+                          <p><strong>Phim:</strong> @Model.MovieTitle</p>
+                          <p><strong>Suất chiếu:</strong> @Model.Showtime</p>
+                          <p><strong>Rạp:</strong> @Model.Auditorium</p>
+                 }
+
+                 @* Hiển thị ghế (ưu tiên ViewBag) *@
+                 @if (!string.IsNullOrEmpty(ViewBag.SelectedSeats))
+                {
+                         <p><strong>Ghế:</strong> @ViewBag.SelectedSeats</p>
+                 }
+                else if (Model != null && Model.SelectedSeats != null && Model.SelectedSeats.Any())
+                {
+                          <p><strong>Ghế:</strong> @string.Join(", ", Model.SelectedSeats)</p>
+                 }
+
+                 @* Hiển thị số lượng vé (ưu tiên ViewBag) *@
+                 @{
+                         // Lấy giá trị từ ViewBag trước, nếu null thì lấy từ Model
+                         int adultTickets = ViewBag.AdultTickets ?? Model?.AdultTickets ?? 0;
+                         int childTickets = ViewBag.ChildTickets ?? Model?.ChildTickets ?? 0;
+                         int studentTickets = ViewBag.StudentTickets ?? Model?.StudentTickets ?? 0;
+                 }
+                 @if (adultTickets > 0 || childTickets > 0 || studentTickets > 0)
+                 {
+                         <p><strong>Loại vé:</strong>
+                             @if (adultTickets > 0)
+                            {
+                                 <span>Người lớn (@adultTickets),</span>
+                             }
+                             @if (childTickets > 0)
+                            {
+                                 <span>Trẻ em (@childTickets),</span>
+                             }
+                             @if (studentTickets > 0)
+                            {
+                                 <span>Học sinh/SV (@studentTickets)</span>
+                             }
+                             @* Remove trailing comma if needed *@
+                         </p>
+                 }
+
+                 @* Hiển thị combo (ưu tiên ViewBag) *@
+                 @{
+                        // 👇 FIX: Use 'if' instead of '??' operator here 👇
+                        var combosToShow = ViewBag.Combos as List<ComboViewModel>;
+                        if (combosToShow == null && Model?.Combos != null)
+                        {
+                                combosToShow = Model.Combos;
+                        }
+                 }
+                 @if (combosToShow != null && combosToShow.Count > 0)
+                 {
+                         <p class="mb-1"><strong>Combo:</strong></p>
+                         <ul class="list-unstyled ms-3"> @* Use list-unstyled for cleaner look *@
+                             @foreach (var combo in combosToShow)
+                             {
+                                     <li>- @combo.ComboName x @combo.Quantity</li>
+                             }
+                         </ul>
+                 }
+             </div>
+        </div>
+        @* --- KẾT THÚC PHẦN HIỂN THỊ THÔNG TIN CHI TIẾT --- *@
+
+
+        <div class="mt-4">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary me-2 mb-2"> <i class="bi bi-house-door me-1"></i>Về trang chủ</a>
+            <a asp-controller="Ticket" asp-action="MyTickets" class="btn btn-primary mb-2"> <i class="bi bi-ticket-perforated me-1"></i>Xem vé của tôi</a>
+        </div>
+    </div>
+</div>

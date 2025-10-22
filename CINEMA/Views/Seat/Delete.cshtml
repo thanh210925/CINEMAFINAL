@@ -1,0 +1,27 @@
+﻿@model CINEMA.Models.Seat
+@{
+    ViewData["Title"] = "Xóa ghế";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold text-danger mb-3">🗑 Xóa Ghế</h2>
+
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle"></i>
+        Bé có chắc muốn xóa ghế
+        <strong>@Model.RowLabel@Model.SeatNumber</strong>
+        trong phòng
+        <strong>@Model.Auditorium?.Name</strong> không?
+    </div>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="SeatId" />
+        <button type="submit" class="btn btn-danger me-2">
+            <i class="bi bi-trash"></i> Xóa
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Hủy
+        </a>
+    </form>
+</div>

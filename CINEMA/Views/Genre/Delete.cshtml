@@ -1,0 +1,96 @@
+﻿@model CINEMA.Models.Genre
+
+@{
+    ViewData["Title"] = "Xóa Thể loại";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-danger text-white d-flex align-items-center justify-content-between">
+            <h4 class="mb-0">🗑️ Xóa Thể loại</h4>
+        </div>
+
+        <div class="card-body">
+            <h5 class="fw-bold text-danger">@Model.Name</h5>
+            <p class="text-muted">@Model.Description</p>
+
+            <div class="mb-3">
+                <label class="fw-bold">Phim trong thể loại này:</label>
+                @if (Model.Movies != null && Model.Movies.Any())
+                {
+                    <ul>
+                        @foreach (var movie in Model.Movies)
+                        {
+                            <li>@movie.Title</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted">Không có phim nào trong thể loại này.</p>
+                }
+            </div>
+
+            <!-- Nút mở popup xác nhận -->
+            <button type="button" class="btn btn-danger px-4 me-2" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                <i class="bi bi-trash"></i> Xóa Thể loại
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary px-4">
+                <i class="bi bi-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold" id="confirmDeleteModalLabel">Xác nhận xóa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="fs-5">
+                    Bé có chắc chắn muốn xóa thể loại <strong class="text-danger">@Model.Name</strong> không?
+                    Hành động này <strong>không thể hoàn tác</strong>!
+                </p>
+            </div>
+            <div class="modal-footer">
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="GenreId" />
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Hủy
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-check-circle"></i> Xóa
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .modal-content {
+            border-radius: 1rem;
+        }
+
+        .modal-header {
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+        }
+
+        .btn-danger, .bg-danger {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            border: none;
+        }
+
+            .btn-danger:hover {
+                background: linear-gradient(135deg, #b91c1c, #dc2626);
+            }
+    </style>
+}

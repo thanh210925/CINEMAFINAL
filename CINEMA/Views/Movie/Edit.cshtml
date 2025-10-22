@@ -4,66 +4,124 @@
     Layout = "_AdminLayout";
 }
 
-<h2 class="fw-bold mb-4">✏️ Sửa thông tin phim</h2>
-
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="MovieId" />
-
-    <div class="mb-3">
-        <label class="form-label">Tên phim</label>
-        <input asp-for="Title" class="form-control" />
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <h2 class="fw-bold mb-0 text-primary">
+            <i class="bi bi-pencil-square me-2"></i> Sửa thông tin phim
+        </h2>
     </div>
 
-    <div class="mb-3">
-        <label class="form-label">Thời lượng (phút)</label>
-        <input asp-for="Duration" type="number" class="form-control" />
-    </div>
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="MovieId" />
 
-    <div class="mb-3">
-        <label class="form-label">Ngày khởi chiếu</label>
-        <input asp-for="ReleaseDate" type="date" class="form-control"
-               value="@(Model.ReleaseDate.HasValue? Model.ReleaseDate.Value.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) : "")" />
-    </div>
+        <div class="row">
+            <!-- Left Column: Thông tin -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="mb-0 fw-semibold text-dark">
+                            <i class="bi bi-info-circle text-primary me-2"></i> Thông tin cơ bản
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Tên phim</label>
+                            <input asp-for="Title" class="form-control form-control-lg" placeholder="Nhập tên phim..." />
+                        </div>
 
-    <div class="mb-3">
-        <label class="form-label">Quốc gia</label>
-        <input asp-for="Country" class="form-control" />
-    </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-semibold">Thời lượng (phút)</label>
+                                <input asp-for="Duration" type="number" class="form-control" placeholder="120" />
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-semibold">Ngày khởi chiếu</label>
+                                <input asp-for="ReleaseDate" type="date" class="form-control"
+                                       value="@(Model.ReleaseDate.HasValue? Model.ReleaseDate.Value.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) : "")" />
+                            </div>
+                        </div>
 
-    <div class="mb-3">
-        <label class="form-label">Ngôn ngữ</label>
-        <input asp-for="Language" class="form-control" />
-    </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-4">
+                                <label class="form-label fw-semibold">Quốc gia</label>
+                                <input asp-for="Country" class="form-control" placeholder="Việt Nam" />
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <label class="form-label fw-semibold">Ngôn ngữ</label>
+                                <input asp-for="Language" class="form-control" placeholder="Tiếng Việt" />
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <label class="form-label fw-semibold">Giới hạn tuổi</label>
+                                <input asp-for="AgeRating" class="form-control" placeholder="T13, T16, T18..." />
+                            </div>
+                        </div>
 
-    <div class="mb-3">
-        <label class="form-label">Giới hạn tuổi</label>
-        <input asp-for="AgeRating" class="form-control" />
-    </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Mô tả</label>
+                            <textarea asp-for="Description" class="form-control" rows="5" placeholder="Nhập mô tả nội dung phim..."></textarea>
+                        </div>
 
-    <div class="mb-3">
-        <label class="form-label">Trạng thái</label>
-        <select asp-for="IsActive" class="form-control">
-            <option value="true" selected="@(Model.IsActive == true)">Đang chiếu</option>
-            <option value="false" selected="@(Model.IsActive == false)">Ngưng chiếu</option>
-        </select>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Mô tả</label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Poster URL</label>
-        <input asp-for="PosterUrl" class="form-control" />
-        @if (!string.IsNullOrEmpty(Model.PosterUrl))
-        {
-            <div class="mt-2">
-                <img src="@Model.PosterUrl" alt="@Model.Title" style="max-height:150px;" />
+                        <div>
+                            <label class="form-label fw-semibold">Trạng thái</label>
+                            <select asp-for="IsActive" class="form-select">
+                                <option value="true" selected="@(Model.IsActive == true)">Đang chiếu</option>
+                                <option value="false" selected="@(Model.IsActive == false)">Ngưng chiếu</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
-        }
-    </div>
 
-    <button type="submit" class="btn btn-primary">💾 Lưu thay đổi</button>
-    <a asp-action="Index" class="btn btn-secondary">Hủy</a>
-</form>
+            <!-- Right Column: Poster -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="mb-0 fw-semibold text-dark">
+                            <i class="bi bi-image text-success me-2"></i> Poster phim
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">URL Poster</label>
+                            <input asp-for="PosterUrl" class="form-control" placeholder="https://..." />
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.PosterUrl))
+                        {
+                            <div class="text-center">
+                                <div class="border rounded bg-light p-2">
+                                    <img src="@Model.PosterUrl" alt="@Model.Title"
+                                         class="img-fluid rounded shadow-sm"
+                                         style="max-height:400px; width:100%; object-fit:cover;" />
+                                </div>
+                                <small class="text-muted d-block mt-2">Preview poster hiện tại</small>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5 bg-light rounded border border-dashed">
+                                <div class="text-muted">
+                                    <i class="bi bi-image fs-1 mb-2"></i>
+                                    <p class="mb-0">Chưa có poster</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4 text-end">
+                <button type="submit" class="btn btn-primary btn-lg px-4 me-2 shadow">
+                    <i class="bi bi-save me-2"></i>Lưu thay đổi
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="bi bi-arrow-left-circle me-2"></i>Hủy
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

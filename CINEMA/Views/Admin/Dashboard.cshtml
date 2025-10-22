@@ -33,8 +33,8 @@
                     <div class="icon">🏛️</div>
                     <h5 class="card-title">Quản lý Phòng chiếu</h5>
                     <div class="btn-group-custom">
-                        <a asp-controller="Room" asp-action="Index" class="btn btn-light">Xem Phòng</a>
-                        <a asp-controller="Room" asp-action="Create" class="btn btn-outline-light">Thêm Phòng</a>
+                        <a asp-controller="Auditorium" asp-action="Index" class="btn btn-light">Xem Phòng</a>
+                        <a asp-controller="Auditorium" asp-action="Create" class="btn btn-outline-light">Thêm Phòng</a>
                     </div>
                 </div>
             </div>
@@ -61,8 +61,8 @@
                     <div class="icon">📅</div>
                     <h5 class="card-title">Quản lý Lịch chiếu</h5>
                     <div class="btn-group-custom">
-                        <a asp-controller="Schedule" asp-action="Index" class="btn btn-light">Xem Lịch</a>
-                        <a asp-controller="Schedule" asp-action="Create" class="btn btn-outline-light">Thêm Lịch</a>
+                        <a asp-controller="Showtime" asp-action="Index" class="btn btn-light">Xem Lịch</a>
+                        <a asp-controller="Showtime" asp-action="Create" class="btn btn-outline-light">Thêm Lịch</a>
                     </div>
                 </div>
             </div>
@@ -89,8 +89,8 @@
                     <div class="icon">🎭</div>
                     <h5 class="card-title">Quản lý Thể loại</h5>
                     <div class="btn-group-custom">
-                        <a asp-controller="Category" asp-action="Index" class="btn btn-light">Xem Thể loại</a>
-                        <a asp-controller="Category" asp-action="Create" class="btn btn-outline-light">Thêm Thể loại</a>
+                        <a asp-controller="Genre" asp-action="Index" class="btn btn-light">Xem Thể loại</a>
+                        <a asp-controller="Genre" asp-action="Create" class="btn btn-outline-light">Thêm Thể loại</a>
                     </div>
                 </div>
             </div>
@@ -109,7 +109,19 @@
                 </div>
             </div>
         </div>
-
+        <!-- Quản lý Phòng chiếu -->
+        <div class="col-md-4">
+            <div class="card dashboard-card blue">
+                <div class="card-body text-center text-white">
+                    <div class="icon">🏛️</div>
+                    <h5 class="card-title">Quản lý Rạp</h5>
+                    <div class="btn-group-custom">
+                        <a asp-controller="Theater" asp-action="Index" class="btn btn-light">Xem Phòng</a>
+                        <a asp-controller="Theater" asp-action="Create" class="btn btn-outline-light">Thêm Phòng</a>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Quản lý Đơn hàng -->
         <div class="col-md-4">
             <div class="card dashboard-card teal">

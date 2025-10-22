@@ -1,4 +1,4 @@
-html {
+﻿html {
   font-size: 14px;
 }
 
@@ -23,3 +23,89 @@ body {
 body {
     background-color: #f8f6f1;
 }
+body {
+    background: linear-gradient(-45deg, #fff1eb, #ace0f9, #fff1eb, #ace0f9);
+    background-size: 400% 400%;
+    animation: gradientMove 15s ease infinite;
+    min-height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+
+}
+footer a:hover {
+    color: #ffd700 !important;
+    text-decoration: underline;
+}
+
+footer .btn {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+    footer .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
+    }
+
+.flag-icon {
+    font-size: 1.2rem;
+}
+form.bg-white {
+    background: linear-gradient(145deg, #ffffff, #f5f7fa);
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #2563eb, #3b82f6);
+    border: none;
+    transition: all 0.25s ease;
+}
+
+    .btn-primary:hover {
+        background: linear-gradient(90deg, #1d4ed8, #2563eb);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+    }
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-top: 70px; /* Đẩy nội dung xuống dưới navbar */
+    background-color: #f8f9fa;
+}
+
+main {
+    flex: 1;
+}
+
+footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+.navbar-brand i {
+    color: #dc3545;
+}
+
+.navbar-brand:hover {
+    color: #dc3545;
+}
+
+.nav-link:hover {
+    color: #dc3545 !important;
+}
+
+

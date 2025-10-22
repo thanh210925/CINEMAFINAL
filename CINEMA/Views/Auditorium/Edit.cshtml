@@ -1,0 +1,65 @@
+﻿@model CINEMA.Models.Auditorium
+@{
+    ViewData["Title"] = "Sửa phòng chiếu";
+    var theaters = ViewBag.Theaters as List<CINEMA.Models.Theater>;
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold text-primary mb-4">
+        <i class="bi bi-pencil-square"></i> Sửa thông tin phòng chiếu
+    </h2>
+
+    <form asp-action="Edit" method="post" class="card p-4 shadow-sm border-0">
+        <input type="hidden" asp-for="AuditoriumId" />
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Tên phòng</label>
+                <input asp-for="Name" class="form-control" required />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Rạp chiếu</label>
+                <select asp-for="TheaterId" class="form-select" required>
+                    <option value="">-- Chọn rạp --</option>
+                    @foreach (var t in theaters)
+                    {
+                        <option value="@t.TheaterId" selected="@(t.TheaterId == Model.TheaterId)">
+                            @t.Name
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Số hàng ghế</label>
+                <input asp-for="SeatRows" type="number" min="1" class="form-control" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Số ghế mỗi hàng</label>
+                <input asp-for="SeatCols" type="number" min="1" class="form-control" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Loại màn hình</label>
+                <input asp-for="ScreenType" class="form-control" placeholder="VD: 2D, 3D, IMAX" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Trạng thái</label>
+                <select asp-for="IsActive" class="form-select">
+                    <option value="true" selected="@(Model.IsActive == true)">Hoạt động</option>
+                    <option value="false" selected="@(Model.IsActive == false)">Tạm dừng</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-warning px-4">
+                <i class="bi bi-save"></i> Lưu thay đổi
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </form>
+</div>

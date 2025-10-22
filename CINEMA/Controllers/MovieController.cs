@@ -1,5 +1,6 @@
 ﻿using CINEMA.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CINEMA.Controllers
 {
@@ -11,23 +12,17 @@ namespace CINEMA.Controllers
         {
             _context = context;
         }
-
-        // INDEX
         public IActionResult Index()
         {
             var movies = _context.Movies.ToList();
             return View(movies);
         }
-
-        // DETAILS
         public IActionResult Details(int id)
         {
             var movie = _context.Movies.FirstOrDefault(m => m.MovieId == id);
             if (movie == null) return NotFound();
             return View(movie);
         }
-
-        // CREATE
         [HttpGet]
         public IActionResult Create()
         {
@@ -46,8 +41,6 @@ namespace CINEMA.Controllers
             }
             return View(movie);
         }
-
-        // EDIT
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -68,8 +61,6 @@ namespace CINEMA.Controllers
             }
             return View(movie);
         }
-
-        // GET: Movie/Delete/5
         [HttpGet]
         public IActionResult Delete(int id)
         {
@@ -77,20 +68,41 @@ namespace CINEMA.Controllers
             if (movie == null) return NotFound();
             return View(movie);
         }
-
-        // POST: Movie/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            var movie = _context.Movies.Find(id);
-            if (movie != null)
+            var movie = _context.Movies
+                .Include(m => m.Showtimes)
+                    .ThenInclude(s => s.Tickets) // nếu có vé trong suất chiếu
+                .FirstOrDefault(m => m.MovieId == id);
+
+            if (movie == null)
+                return NotFound();
+
+            // ✅ Xóa tất cả vé thuộc các suất chiếu của phim
+            if (movie.Showtimes != null)
             {
-                _context.Movies.Remove(movie);
-                _context.SaveChanges();
+                foreach (var showtime in movie.Showtimes)
+                {
+                    if (showtime.Tickets != null && showtime.Tickets.Any())
+                    {
+                        _context.Tickets.RemoveRange(showtime.Tickets);
+                    }
+                }
+
+                // ✅ Sau đó xóa luôn các suất chiếu
+                _context.Showtimes.RemoveRange(movie.Showtimes);
             }
+
+            // ✅ Cuối cùng xóa phim
+            _context.Movies.Remove(movie);
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = $"Đã xóa phim \"{movie.Title}\" cùng toàn bộ suất chiếu liên quan.";
             return RedirectToAction(nameof(Index));
         }
+
     }
 }
 

@@ -4,17 +4,63 @@
     Layout = "_AdminLayout";
 }
 
-<h2 class="fw-bold mb-4">👤 Thông tin khách hàng</h2>
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4">
+        <h2 class="fw-bold mb-0 text-primary">
+            <i class="bi bi-person-vcard-fill me-2"></i> Thông tin khách hàng
+        </h2>
+    </div>
 
-<div class="card p-3 shadow-sm">
-    <p><b>ID:</b> @Model.CustomerId</p>
-    <p><b>Họ tên:</b> @Model.FullName</p>
-    <p><b>Email:</b> @Model.Email</p>
-    <p><b>SĐT:</b> @Model.Phone</p>
-    <p><b>Giới tính:</b> @Model.Gender</p>
-    <p><b>Ngày sinh:</b> @Model.BirthDate?.ToString("dd/MM/yyyy")</p>
-    <p><b>Ngày tạo:</b> @Model.CreatedAt?.ToString("dd/MM/yyyy")</p>
-    <p><b>Đăng nhập cuối:</b> @Model.LastLogin?.ToString("dd/MM/yyyy HH:mm")</p>
+    <!-- Card thông tin -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <p class="mb-2">
+                        <i class="bi bi-hash text-secondary me-2"></i>
+                        <strong>ID:</strong> @Model.CustomerId
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-person-fill text-secondary me-2"></i>
+                        <strong>Họ tên:</strong> @Model.FullName
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-envelope-fill text-secondary me-2"></i>
+                        <strong>Email:</strong> @Model.Email
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-telephone-fill text-secondary me-2"></i>
+                        <strong>SĐT:</strong> @Model.Phone
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <p class="mb-2">
+                        <i class="bi bi-gender-ambiguous text-secondary me-2"></i>
+                        <strong>Giới tính:</strong> @Model.Gender
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-calendar-heart text-secondary me-2"></i>
+                        <strong>Ngày sinh:</strong> @Model.BirthDate?.ToString("dd/MM/yyyy")
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-calendar-check-fill text-secondary me-2"></i>
+                        <strong>Ngày tạo:</strong> @Model.CreatedAt?.ToString("dd/MM/yyyy")
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-clock-history text-secondary me-2"></i>
+                        <strong>Đăng nhập cuối:</strong> @Model.LastLogin?.ToString("dd/MM/yyyy HH:mm")
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nút quay lại -->
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-outline-primary px-4">
+            <i class="bi bi-arrow-left-circle me-2"></i> Quay lại danh sách
+        </a>
+    </div>
 </div>
-
-<a asp-action="Index" class="btn btn-secondary mt-3">Quay lại</a>

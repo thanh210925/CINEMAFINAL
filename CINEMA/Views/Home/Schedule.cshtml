@@ -1,0 +1,194 @@
+﻿@model List<CINEMA.Models.Movie>
+@{
+    ViewData["Title"] = "Lịch chiếu phim";
+    var selectedDate = (DateTime)ViewBag.SelectedDate;
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold mb-3"
+            style="font-size: 2.8rem; color: #1d4ed8; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <i class="bi bi-camera-reels-fill"></i> Lịch Chiếu Phim
+        </h1>
+
+        <p class="text-muted fs-5 mb-4">
+            @selectedDate.ToString("dddd, dd/MM/yyyy", new System.Globalization.CultureInfo("vi-VN"))
+        </p>
+        <form method="get"
+              class="bg-white rounded-pill shadow-lg mx-auto px-4 py-3 d-flex align-items-center justify-content-between"
+              style="max-width: 720px; gap: 16px;">
+
+            <!-- Nhóm trái: Icon + label + input -->
+            <div class="d-flex align-items-center flex-grow-1 gap-3">
+                <label class="text-muted fw-semibold mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-calendar-date text-primary fs-5"></i>
+                    <span>Chọn ngày:</span>
+                </label>
+
+                <input type="date"
+                       name="date"
+                       class="form-control border-0 bg-light rounded-3 fw-semibold px-3 py-2"
+                       value="@selectedDate.ToString("yyyy-MM-dd")"
+                       style="max-width: 250px; height: 45px;" />
+            </div>
+
+            <!-- Nút bấm bên phải -->
+            <button type="submit"
+                    class="btn btn-primary rounded-pill px-4 py-2 d-flex align-items-center gap-2 fw-semibold shadow-sm"
+                    style="height: 45px;">
+                <i class="bi bi-search"></i> Xem lịch
+            </button>
+        </form>
+
+    </div>
+
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row gy-4">
+            @foreach (var movie in Model)
+            {
+                <div class="col-12">
+                    <div class="card shadow-lg border-0 overflow-hidden movie-card">
+                        <div class="row g-0">
+                            <!-- Movie Poster -->
+                            <div class="col-md-3 position-relative">
+                                <img src="@movie.PosterUrl"
+                                     alt="@movie.Title"
+                                     class="img-fluid w-100 h-100"
+                                     style="object-fit: cover; min-height: 320px; border-right: 4px solid #0d6efd;" />
+                                <div class="position-absolute bottom-0 start-0 w-100 py-2 px-3 bg-dark bg-opacity-75 text-white small">
+                                    <i class="bi bi-clock me-1"></i> @movie.Duration phút
+                                </div>
+                            </div>
+
+                            <!-- Movie Info -->
+                            <div class="col-md-9 bg-light bg-gradient">
+                                <div class="card-body p-4">
+                                    <!-- Title -->
+                                    <h3 class="fw-bold mb-3 text-dark">@movie.Title</h3>
+
+                                    <!-- Details -->
+                                    <div class="d-flex flex-wrap gap-4 mb-4">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-film text-primary fs-5"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Thể loại</small>
+                                                <span class="fw-semibold">@string.Join(", ", movie.Genres?.Select(g => g.Name) ?? new List<string>())</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-translate text-primary fs-5"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Ngôn ngữ</small>
+                                                <span class="fw-semibold">Phụ đề / Lồng tiếng</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Showtimes -->
+                                    <div class="border-top pt-4">
+                                        <h5 class="fw-semibold mb-3 text-secondary">
+                                            <i class="bi bi-calendar-event me-2"></i>Suất chiếu trong ngày
+                                        </h5>
+
+                                        @{
+                                            var showtimes = movie.Showtimes
+                                            .Where(s => s.StartTime.HasValue &&
+                                            s.StartTime.Value.Date == selectedDate.Date &&
+                                            s.IsActive == true)
+                                            .OrderBy(s => s.StartTime)
+                                            .ToList();
+                                        }
+
+                                        @if (showtimes.Any())
+                                        {
+                                            <div class="d-flex flex-wrap gap-3">
+                                                @foreach (var s in showtimes)
+                                                {
+                                                    <a asp-controller="Home"
+                                                       asp-action="BookTicket"
+                                                       asp-route-id="@movie.MovieId"
+                                                       asp-route-showtimeId="@s.ShowtimeId"
+                                                       class="btn-showtime shadow-sm text-decoration-none">
+                                                        <div class="fw-bold fs-5">@s.StartTime?.ToString("HH:mm")</div>
+                                                        <div class="text-muted small">@s.Auditorium?.Name</div>
+                                                        <div class="text-danger fw-semibold mt-1">
+                                                            @((s.BasePrice ?? 0).ToString("N0")) đ
+                                                        </div>
+                                                    </a>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <p class="text-muted mb-0">
+                                                <i class="bi bi-info-circle me-2"></i>Chưa có suất chiếu cho ngày này.
+                                            </p>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-calendar-x display-1 text-muted mb-4"></i>
+            <h4 class="text-muted mb-2">Không có suất chiếu</h4>
+            <p class="text-muted">Không có phim nào chiếu trong ngày này. Vui lòng chọn ngày khác.</p>
+        </div>
+    }
+</div>
+
+<!-- CSS -->
+<style>
+    .text-gradient {
+        background: linear-gradient(45deg, #0d6efd, #6610f2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .movie-card {
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+
+        .movie-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+    .btn-showtime {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 130px;
+        padding: 12px;
+        border-radius: 10px;
+        border: 2px solid #0d6efd;
+        color: #0d6efd;
+        background-color: #ffffff;
+        transition: all 0.2s ease;
+        text-align: center;
+    }
+
+        .btn-showtime:hover {
+            background: linear-gradient(135deg, #0d6efd, #5b9df9);
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(13,110,253,0.35);
+        }
+
+            .btn-showtime:hover .text-muted {
+                color: #e0e0e0 !important;
+            }
+</style>

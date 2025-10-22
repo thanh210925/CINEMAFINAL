@@ -1,0 +1,64 @@
+﻿/* 🎬 CineZone Admin Custom Style */
+
+/* Navbar gradient */
+.navbar {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+/* Logo Badge */
+.navbar-brand span.badge {
+    font-size: 1rem;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+/* Menu links */
+.nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    transition: all 0.25s ease;
+}
+
+    .nav-link:hover,
+    .nav-link.active {
+        background-color: rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        color: #fff !important;
+    }
+
+/* Admin badge */
+.admin-badge {
+    background: linear-gradient(135deg, #475569 0%, #334155 100%);
+    color: #fff;
+    font-weight: 500;
+}
+
+/* Body background */
+body {
+    background-color: #f1f5f9;
+}
+
+/* Shadow */
+.shadow-soft {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Footer */
+footer {
+    background: #f8fafc;
+    font-size: 0.9rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+
+    .nav-link {
+        padding: 0.5rem 1rem;
+    }
+
+    .admin-badge {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+}

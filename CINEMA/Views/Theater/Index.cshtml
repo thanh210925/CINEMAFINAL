@@ -1,0 +1,47 @@
+﻿@model IEnumerable<CINEMA.Models.Theater>
+@{
+    ViewData["Title"] = "Danh sách rạp chiếu";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-3 text-primary">🎬 Danh sách rạp chiếu</h2>
+    <a class="btn btn-success mb-3" asp-action="Create">➕ Thêm rạp mới</a>
+
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark text-center">
+            <tr>
+                <th>ID</th>
+                <th>Tên rạp</th>
+                <th>Địa chỉ</th>
+                <th>Điện thoại</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td>@t.TheaterId</td>
+                    <td>@t.Name</td>
+                    <td>@t.Address</td>
+                    <td>@t.Phone</td>
+                    <td>
+                        @if (t.IsActive == true)
+                        {
+                            <span class="badge bg-success">Hoạt động</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Tạm dừng</span>
+                        }
+                    </td>
+                    <td class="text-center">
+                        <a asp-action="Edit" asp-route-id="@t.TheaterId" class="btn btn-warning btn-sm">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@t.TheaterId" class="btn btn-danger btn-sm">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

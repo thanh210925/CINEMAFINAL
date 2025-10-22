@@ -1,0 +1,51 @@
+﻿@model IEnumerable<CINEMA.Models.Genre>
+@{
+    ViewData["Title"] = "Quản lý Thể loại";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold text-primary mb-3">🎭 Quản lý Thể loại</h2>
+    <a asp-action="Create" class="btn btn-success mb-3">➕ Thêm Thể loại</a>
+
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tên thể loại</th>
+                <th>Mô tả</th>
+                <th>Phim thuộc thể loại</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var g in Model)
+            {
+                <tr>
+                    <td>@g.GenreId</td>
+                    <td>@g.Name</td>
+                    <td>@g.Description</td>
+                    <td>
+                        @if (g.Movies.Any())
+                        {
+                            <ul>
+                                @foreach (var movie in g.Movies)
+                                {
+                                    <li>@movie.Title</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <em class="text-muted">Chưa có phim</em>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@g.GenreId" class="btn btn-primary btn-sm">✏ Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@g.GenreId" class="btn btn-danger btn-sm">🗑 Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,36 @@
+﻿@model CINEMA.Models.Theater
+@{
+    ViewData["Title"] = "Chỉnh sửa rạp";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-3 text-warning">✏️ Chỉnh sửa rạp</h2>
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="TheaterId" />
+
+        <div class="mb-3">
+            <label class="form-label">Tên rạp</label>
+            <input asp-for="Name" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Địa chỉ</label>
+            <input asp-for="Address" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Điện thoại</label>
+            <input asp-for="Phone" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Google Map URL</label>
+            <input asp-for="GoogleMapUrl" class="form-control" />
+        </div>
+        <div class="form-check mb-3">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label class="form-check-label">Hoạt động</label>
+        </div>
+
+        <button type="submit" class="btn btn-warning">Cập nhật</button>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </form>
+</div>

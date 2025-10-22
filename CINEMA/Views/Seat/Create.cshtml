@@ -1,0 +1,45 @@
+﻿@model CINEMA.Models.Seat
+@{
+    ViewData["Title"] = "Thêm Ghế";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold text-success mb-4">➕ Thêm Ghế mới</h2>
+    <form asp-action="Create" method="post">
+        <div class="mb-3">
+            <label class="form-label">Phòng chiếu</label>
+            <select asp-for="AuditoriumId" class="form-select"
+                    asp-items="@(new SelectList(ViewBag.Auditoria, "AuditoriumId", "Name"))">
+                <option value="">-- Chọn phòng --</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Hàng ghế</label>
+            <input asp-for="RowLabel" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Số ghế</label>
+            <input asp-for="SeatNumber" type="number" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Loại ghế</label>
+            <select asp-for="SeatType" class="form-select">
+                <option value="Thường">Thường</option>
+                <option value="VIP">VIP</option>
+                <option value="Đôi">Đôi</option>
+            </select>
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label class="form-check-label">Đang hoạt động</label>
+        </div>
+
+        <button type="submit" class="btn btn-success">Lưu</button>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </form>
+</div>

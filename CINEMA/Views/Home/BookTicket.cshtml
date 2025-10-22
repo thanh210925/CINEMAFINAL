@@ -1,0 +1,268 @@
+﻿@model CINEMA.Models.Movie
+@{
+    ViewData["Title"] = "Đặt vé";
+    var showtime = ViewBag.Showtime as CINEMA.Models.Showtime;
+    var combos = ViewBag.Combos as List<CINEMA.Models.Combo>;
+    var bookedSeats = ViewBag.BookedSeats as List<string> ?? new List<string>();
+    var basePrice = showtime?.BasePrice ?? 0m;
+}
+
+<div class="container py-4">
+    <!-- Header -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-ticket-perforated-fill text-danger me-2"></i>
+            Đặt vé xem phim
+        </h2>
+        <p class="text-muted mb-0">Chọn vé, ghế và combo của bạn</p>
+    </div>
+
+    <!-- Thông tin phim -->
+    <div class="card mb-4 shadow-sm border-0 overflow-hidden">
+        <div class="row g-0">
+            <div class="col-md-4 bg-dark">
+                <img src="@Model.PosterUrl"
+                     class="img-fluid w-100 h-100"
+                     alt="@Model.Title"
+                     style="object-fit:cover; min-height:450px;" />
+            </div>
+            <div class="col-md-8">
+                <div class="card-body p-4">
+                    <h3 class="fw-bold mb-3">@Model.Title</h3>
+
+                    <p><strong>Thể loại:</strong> @string.Join(", ", Model.Genres.Select(g => g.Name))</p>
+                    <p><strong>Quốc gia:</strong> @Model.Country</p>
+                    <p><strong>Thời lượng:</strong> @Model.Duration phút</p>
+                    <p><strong>Giới hạn tuổi:</strong> @Model.AgeRating</p>
+                    <p class="text-muted">@Model.Description</p>
+
+                    @if (showtime != null)
+                    {
+                        <div class="bg-light rounded p-3 mt-3">
+                            <h6 class="fw-bold text-success mb-3">
+                                <i class="bi bi-camera-reels me-2"></i>Suất chiếu đã chọn
+                            </h6>
+                            <p><strong>Ngày chiếu:</strong> @showtime.StartTime?.ToString("dd/MM/yyyy")</p>
+                            <p><strong>Giờ chiếu:</strong> @showtime.StartTime?.ToString("HH:mm") - @showtime.EndTime?.ToString("HH:mm")</p>
+                            <p><strong>Giá vé cơ bản:</strong> <span class="text-danger fw-bold">@basePrice.ToString("N0") đ</span></p>
+                            <p><strong>Ngôn ngữ:</strong> @showtime.Language</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Vui lòng chọn suất chiếu để xem chi tiết.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form đặt vé -->
+    @* ✅ Cập nhật form trỏ đến PaymentController.Index *@
+    <form asp-controller="Payment" asp-action="Index" method="post">
+        <input type="hidden" name="MovieId" value="@Model.MovieId" />
+        <input type="hidden" name="ShowtimeId" value="@showtime?.ShowtimeId" />
+        <input type="hidden" id="basePrice" name="BasePrice" value="@basePrice" />
+        <input type="hidden" id="TotalPriceHidden" name="TotalPrice" value="0" />
+
+        <!-- Chọn loại vé -->
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header bg-white border-bottom py-3 fw-bold">
+                <i class="bi bi-ticket-detailed text-primary me-2"></i> Chọn loại vé
+            </div>
+            <div class="card-body row g-4">
+                <div class="col-md-4">
+                    <label class="fw-semibold">Người lớn (@basePrice.ToString("N0") đ)</label>
+                    <input type="number" class="form-control ticket-input" name="AdultTickets" min="0" value="0" />
+                </div>
+                <div class="col-md-4">
+                    <label class="fw-semibold">Trẻ em (@(decimal.Multiply(basePrice, 0.7m).ToString("N0")) đ)</label>
+                    <input type="number" class="form-control ticket-input" name="ChildTickets" min="0" value="0" />
+                </div>
+                <div class="col-md-4">
+                    <label class="fw-semibold">Học sinh/SV (@(decimal.Multiply(basePrice, 0.8m).ToString("N0")) đ)</label>
+                    <input type="number" class="form-control ticket-input" name="StudentTickets" min="0" value="0" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Chọn ghế -->
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header bg-white border-bottom py-3 fw-bold">
+                <i class="bi bi-grid-3x3 text-danger me-2"></i> Chọn ghế ngồi
+                <small class="text-muted d-block">Chọn đúng số lượng ghế theo số vé đã chọn</small>
+            </div>
+
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="bg-dark text-white px-5 py-2 rounded-pill">Màn hình</div>
+                </div>
+
+                @{
+                    var seats = ViewBag.Seats as List<CINEMA.Models.Seat> ?? new List<CINEMA.Models.Seat>();
+                    string currentRow = "";
+                }
+
+                <div class="d-flex flex-column align-items-center">
+                    @foreach (var seat in seats)
+                    {
+                        string seatCode = $"{seat.RowLabel}{seat.SeatNumber}";
+                        bool isBooked = bookedSeats.Contains(seatCode);
+
+                        if (currentRow != seat.RowLabel)
+                        {
+                            if (!string.IsNullOrEmpty(currentRow))
+                            {
+                                @:</div>
+                            }
+
+                            currentRow = seat.RowLabel;
+                            @:<div class="d-flex justify-content-center align-items-center mb-2">
+                            @:<span class="badge bg-secondary me-2">@currentRow</span>
+                        }
+
+                        <label class="m-1" style="cursor:pointer;">
+                            <input type="checkbox"
+                                   class="seat-checkbox d-none"
+                                   name="Seats"
+                                   value="@seatCode"
+                                   @(isBooked ? "disabled" : "") />
+                            <span class="badge px-3 py-2 seat-badge @(isBooked ? "bg-danger" : "bg-secondary")">
+                                @seat.SeatNumber
+                            </span>
+                        </label>
+                    }
+                    @if (!string.IsNullOrEmpty(currentRow))
+                    {
+                        @:</div>
+                    }
+                </div>
+
+                <div class="d-flex justify-content-center gap-4 mt-3">
+                    <div><span class="badge bg-secondary">1</span> Trống</div>
+                    <div><span class="badge bg-success">1</span> Đang chọn</div>
+                    <div><span class="badge bg-danger">1</span> Đã đặt</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chọn combo -->
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header bg-white border-bottom py-3 fw-bold">
+                <i class="bi bi-cup-straw text-warning me-2"></i> Chọn combo
+            </div>
+            <div class="card-body">
+                @if (combos != null && combos.Any())
+                {
+                    <div class="row g-4">
+                        @foreach (var combo in combos)
+                        {
+                            <div class="col-md-4">
+                                <div class="card h-100 border shadow-sm">
+                                    @if (!string.IsNullOrEmpty(combo.ImageUrl))
+                                    {
+                                        <img src="@combo.ImageUrl" class="card-img-top" style="height:160px; object-fit:cover;" />
+                                    }
+                                    <div class="card-body">
+                                        <h6 class="fw-bold">@combo.Name</h6>
+                                        <p class="text-muted small">@combo.Description</p>
+                                        <p class="fw-bold text-danger">@combo.Price?.ToString("N0") đ</p>
+                                        <input type="number" class="form-control combo-input"
+                                               name="Combo_@combo.ComboId"
+                                               min="0" value="0"
+                                               data-price="@combo.Price" />
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">Hiện chưa có combo nào.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Tổng tiền + Xác nhận -->
+        <div class="card shadow border-0 sticky-bottom">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1">Tổng thanh toán: <span id="totalPrice">0</span> đ</h5>
+                    <p class="text-danger mb-0">⏳ Thời gian giữ vé: <span id="countdown">10:00</span></p>
+                </div>
+                <button type="submit" class="btn btn-danger btn-lg fw-bold">
+                    <i class="bi bi-check-circle me-2"></i> Xác nhận & Thanh toán
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function calcTotal() {
+            const basePrice = parseFloat(document.getElementById("basePrice").value) || 0;
+            let adult = parseInt(document.getElementsByName("AdultTickets")[0].value) || 0;
+            let child = parseInt(document.getElementsByName("ChildTickets")[0].value) || 0;
+            let student = parseInt(document.getElementsByName("StudentTickets")[0].value) || 0;
+
+            let total = adult * basePrice + child * (basePrice * 0.7) + student * (basePrice * 0.8);
+
+            document.querySelectorAll(".combo-input").forEach(el => {
+                let qty = parseInt(el.value) || 0;
+                let price = parseFloat(el.dataset.price) || 0;
+                total += qty * price;
+            });
+
+            document.getElementById("totalPrice").innerText = total.toLocaleString("vi-VN");
+            document.getElementById("TotalPriceHidden").value = total;
+        }
+
+        function limitSeats() {
+            let adult = parseInt(document.getElementsByName("AdultTickets")[0].value) || 0;
+            let child = parseInt(document.getElementsByName("ChildTickets")[0].value) || 0;
+            let student = parseInt(document.getElementsByName("StudentTickets")[0].value) || 0;
+            let maxSeats = adult + child + student;
+
+            let checkedSeats = document.querySelectorAll(".seat-checkbox:checked");
+            if (checkedSeats.length > maxSeats) {
+                alert("Bạn chỉ được chọn " + maxSeats + " ghế theo số vé đã chọn!");
+                checkedSeats[checkedSeats.length - 1].checked = false;
+            }
+        }
+
+        document.querySelectorAll(".seat-checkbox").forEach(cb => {
+            cb.addEventListener("change", function () {
+                const badge = this.nextElementSibling;
+                if (this.checked) {
+                    badge.classList.remove("bg-secondary");
+                    badge.classList.add("bg-success");
+                } else {
+                    badge.classList.remove("bg-success");
+                    badge.classList.add("bg-secondary");
+                }
+                limitSeats();
+                calcTotal();
+            });
+        });
+
+        document.querySelectorAll(".ticket-input, .combo-input").forEach(el => {
+            el.addEventListener("input", calcTotal);
+        });
+
+        let timeLeft = 600;
+        setInterval(() => {
+            if (timeLeft <= 0) return;
+            timeLeft--;
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById("countdown").innerText = `${m}:${s.toString().padStart(2, '0')}`;
+        }, 1000);
+
+        calcTotal();
+    </script>
+}

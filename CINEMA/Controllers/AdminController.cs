@@ -11,8 +11,6 @@ namespace CINEMA.Controllers
         {
             _context = context;
         }
-
-        // ---------------- REGISTER ----------------
         [HttpGet]
         public IActionResult Register()
         {
@@ -49,8 +47,6 @@ namespace CINEMA.Controllers
 
             return RedirectToAction("Login", "Admin");
         }
-
-        // ---------------- LOGIN ----------------
         [HttpGet]
         public IActionResult Login()
         {
@@ -75,8 +71,6 @@ namespace CINEMA.Controllers
             ViewBag.Error = "Sai tài khoản hoặc mật khẩu!";
             return View();
         }
-
-        // ---------------- DASHBOARD ----------------
         public IActionResult Dashboard()
         {
             if (HttpContext.Session.GetString("Role") != "Admin")
@@ -87,8 +81,6 @@ namespace CINEMA.Controllers
             ViewBag.Name = HttpContext.Session.GetString("Name");
             return View();
         }
-
-        // ---------------- LOGOUT ----------------
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();

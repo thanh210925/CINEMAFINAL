@@ -4,48 +4,90 @@
     Layout = "_AdminLayout";
 }
 
-<h2 class="fw-bold mb-4">➕ Thêm phim mới</h2>
+<div style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+    <h2 style="font-weight: 700; font-size: 2rem; margin-bottom: 2rem; color: #1a1a1a; display: flex; align-items: center; gap: 0.75rem;">
+        <span style="font-size: 2.5rem;">🎬</span>
+        Thêm phim mới
+    </h2>
 
-<form asp-action="Create" method="post">
-    <div class="mb-3">
-        <label class="form-label">Tên phim</label>
-        <input asp-for="Title" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Thời lượng (phút)</label>
-        <input asp-for="Duration" type="number" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Ngày khởi chiếu</label>
-        <input asp-for="ReleaseDate" type="date" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Quốc gia</label>
-        <input asp-for="Country" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Ngôn ngữ</label>
-        <input asp-for="Language" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Giới hạn tuổi</label>
-        <input asp-for="AgeRating" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Trạng thái</label>
-        <select asp-for="IsActive" class="form-control">
-            <option value="true">Đang chiếu</option>
-            <option value="false">Ngưng chiếu</option>
-        </select>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Mô tả</label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Poster URL</label>
-        <input asp-for="PosterUrl" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Lưu</button>
-    <a asp-action="Index" class="btn btn-secondary">Hủy</a>
-</form>
+    <form asp-action="Create" method="post" style="background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+
+        <div style="margin-bottom: 1.75rem;">
+            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151; font-size: 0.95rem;">
+                Tên phim
+            </label>
+            <input asp-for="Title" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; transition: all 0.2s;" onfocus="this.style.borderColor='#3b82f6'; this.style.outline='none'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'" />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.75rem;">
+            <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151; font-size: 0.95rem;">
+                     Thời lượng (phút)
+                </label>
+                <input asp-for="Duration" type="number" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; transition: all 0.2s;" onfocus="this.style.borderColor='#3b82f6'; this.style.outline='none'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'" />
+            </div>
+            <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151; font-size: 0.95rem;">
+                    Ngày khởi chiếu
+                </label>
+                <input asp-for="ReleaseDate" type="date" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; transition: all 0.2s;" onfocus="this.style.borderColor='#3b82f6'; this.style.outline='none'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'" />
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.75rem;">
+            <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151; font-size: 0.95rem;">
+                    Quốc gia
+                </label>
+                <input asp-for="Country" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; transition: all 0.2s;" onfocus="this.style.borderColor='#3b82f6'; this.style.outline='none'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'" />
+            </div>
+            <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151; font-size: 0.95rem;">
+                    Ngôn ngữ
+                </label>
+                <input asp-for="Language" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; transition: all 0.2s;" onfocus="this.style.borderColor='#3b82f6'; this.style.outline='none'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'" />
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.75rem;">
+            <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151; font-size: 0.95rem;">
+                    Giới hạn tuổi
+                </label>
+                <input asp-for="AgeRating" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; transition: all 0.2s;" onfocus="this.style.borderColor='#3b82f6'; this.style.outline='none'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'" />
+            </div>
+            <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151; font-size: 0.95rem;">
+                    Trạng thái
+                </label>
+                <select asp-for="IsActive" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; background: white; transition: all 0.2s; cursor: pointer;" onfocus="this.style.borderColor='#3b82f6'; this.style.outline='none'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+                    <option value="true">Đang chiếu</option>
+                    <option value="false">Ngưng chiếu</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1.75rem;">
+            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151; font-size: 0.95rem;">
+                Mô tả
+            </label>
+            <textarea asp-for="Description" rows="4" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; resize: vertical; font-family: inherit; transition: all 0.2s;" onfocus="this.style.borderColor='#3b82f6'; this.style.outline='none'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'"></textarea>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151; font-size: 0.95rem;">
+                Poster URL
+            </label>
+            <input asp-for="PosterUrl" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; transition: all 0.2s;" onfocus="this.style.borderColor='#3b82f6'; this.style.outline='none'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'" />
+        </div>
+
+        <div style="display: flex; gap: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+            <button type="submit" style="flex: 1; padding: 0.875rem 1.5rem; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#2563eb'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 6px -1px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.background='#3b82f6'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                Lưu phim
+            </button>
+            <a asp-action="Index" style="flex: 1; padding: 0.875rem 1.5rem; background: #f3f4f6; color: #374151; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; text-decoration: none; text-align: center; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">
+                Hủy
+            </a>
+        </div>
+    </form>
+</div>

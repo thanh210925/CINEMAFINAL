@@ -1,0 +1,123 @@
+﻿@model CINEMA.ViewModels.PaymentViewModel
+@{
+    ViewData["Title"] = "Xác nhận & Thanh toán";
+}
+<div class="container py-5">
+    <h2 class="text-center mb-4 text-danger">🎟️ XÁC NHẬN THANH TOÁN VÉ</h2>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-primary text-white fw-bold">👤 Thông tin khách hàng</div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.CustomerName))
+                    {
+                        <p><strong>Họ và tên:</strong> @Model.CustomerName</p>
+                        <p><strong>Email:</strong> @Model.CustomerEmail</p>
+                        <p><strong>Số điện thoại:</strong> @Model.CustomerPhone</p>
+                    }
+                    else
+                    {
+
+                        <p class="text-muted">Đang tải...</p>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-light fw-bold">🎬 Chi tiết đặt vé</div>
+                <div class="card-body">
+                    <h5 class="fw-bold text-primary mb-3">@Model.MovieTitle</h5>
+                    <p><strong>Suất chiếu:</strong> @Model.Showtime</p>
+                    <p><strong>Phòng chiếu:</strong> @Model.Auditorium</p>
+                    <p><strong>Ghế đã chọn:</strong> @string.Join(", ", Model.SelectedSeats)</p>
+                    <hr />
+                    <h6>Loại vé</h6>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item d-flex justify-content-between"><span>Người lớn:</span> <span>@Model.AdultTickets vé</span></li>
+                        <li class="list-group-item d-flex justify-content-between"><span>Trẻ em:</span> <span>@Model.ChildTickets vé</span></li>
+                        <li class="list-group-item d-flex justify-content-between"><span>Học sinh/SV:</span> <span>@Model.StudentTickets vé</span></li>
+                    </ul>
+
+                    @* --- HIỂN THỊ COMBO --- *@
+                    @if (Model.Combos != null && Model.Combos.Any())
+                    {
+                        <h6>🍿 Combo đã chọn</h6>
+                        <ul class="list-group list-group-flush mb-3">
+                            @foreach (var combo in Model.Combos)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>@combo.ComboName x @combo.Quantity</span>
+                                    <span class="text-danger fw-bold">@((combo.Price * combo.Quantity).ToString("N0")) đ</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    @* --- KẾT THÚC COMBO --- *@
+
+                    <div class="text-end">
+                        <h4 class="fw-bold text-danger">Tổng tiền: @Model.TotalPrice.ToString("N0") đ</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card shadow border-0">
+                <div class="card-header bg-light fw-bold">💳 Thanh toán</div>
+                <div class="card-body">
+                    <form asp-controller="Payment" asp-action="Confirm" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <!-- --- Input hidden gửi đi --- -->
+                        <input type="hidden" asp-for="MovieId" />
+                        <input type="hidden" asp-for="ShowtimeId" />
+                        @foreach (var seat in Model.SelectedSeats)
+                        {
+                            <input type="hidden" name="SelectedSeats" value="@seat" />
+                        }
+                        <input type="hidden" asp-for="AdultTickets" />
+                        <input type="hidden" asp-for="ChildTickets" />
+                        <input type="hidden" asp-for="StudentTickets" />
+                        <input type="hidden" asp-for="TotalPrice" />
+
+                        @if (Model.Combos != null)
+                        {
+                            @for (int i = 0; i < Model.Combos.Count; i++)
+                            {
+                                <input type="hidden" name="Combos[@i].OrderComboId" value="@Model.Combos[i].OrderComboId" />
+                                <input type="hidden" name="Combos[@i].ComboId" value="@Model.Combos[i].ComboId" />
+                                <input type="hidden" name="Combos[@i].ComboName" value="@Model.Combos[i].ComboName" />
+                                <input type="hidden" name="Combos[@i].Quantity" value="@Model.Combos[i].Quantity" />
+                                <input type="hidden" name="Combos[@i].Price" value="@Model.Combos[i].Price" />
+                            }
+                        }
+
+                        <input type="hidden" name="method" value="Chuyển khoản" />
+
+                        <p class="text-muted">Bạn sẽ được chuyển hướng đến cổng thanh toán VNPAY để hoàn tất giao dịch.</p>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="checkAge" required>
+                            <label class="form-check-label small" for="checkAge">
+                                Đảm bảo mua vé đúng số tuổi quy định.
+                            </label>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="checkTerms" required>
+                            <label class="form-check-label small" for="checkTerms">
+                                Đồng ý với điều khoản của CinemaZone.
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-danger btn-lg w-100">
+                            <i class="bi bi-credit-card-fill me-2"></i> Xác nhận & Thanh toán VNPAY
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

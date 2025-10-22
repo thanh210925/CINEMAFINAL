@@ -1,4 +1,5 @@
 ﻿using CINEMA.Models;
+using CINEMA.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace CINEMA
@@ -19,7 +20,7 @@ namespace CINEMA
             // ✅ Bật Session (dùng cho đăng nhập/đăng xuất)
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession();
-
+            builder.Services.AddScoped<IVnpayService, VnpayService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -33,11 +34,8 @@ namespace CINEMA
             app.UseStaticFiles();
 
             app.UseRouting();
-
-            app.UseAuthorization();
-
-            // ✅ Kích hoạt Session
-            app.UseSession();
+            app.UseSession();       // <--- Session chạy TRƯỚC
+          //  app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",

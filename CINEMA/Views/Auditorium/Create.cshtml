@@ -1,0 +1,59 @@
+﻿@model CINEMA.Models.Auditorium
+@{
+    ViewData["Title"] = "Thêm phòng chiếu";
+    var theaters = ViewBag.Theaters as List<CINEMA.Models.Theater>;
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold text-primary mb-4"><i class="bi bi-tv"></i> Thêm phòng chiếu mới</h2>
+
+    <form asp-action="Create" method="post" class="card p-4 shadow-sm border-0">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Tên phòng</label>
+                <input asp-for="Name" class="form-control" required />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Rạp</label>
+                <select asp-for="TheaterId" class="form-select" required>
+                    <option value="">-- Chọn rạp --</option>
+                    @foreach (var t in theaters)
+                    {
+                        <option value="@t.TheaterId">@t.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Số hàng ghế</label>
+                <input asp-for="SeatRows" type="number" min="1" class="form-control" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Số ghế mỗi hàng</label>
+                <input asp-for="SeatCols" type="number" min="1" class="form-control" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Loại màn hình</label>
+                <input asp-for="ScreenType" class="form-control" placeholder="VD: 2D, 3D, IMAX" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Trạng thái</label>
+                <select asp-for="IsActive" class="form-select">
+                    <option value="true">Hoạt động</option>
+                    <option value="false">Tạm dừng</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-success px-4">
+                <i class="bi bi-plus-circle"></i> Thêm phòng
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+        </div>
+    </form>
+</div>
