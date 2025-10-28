@@ -1,0 +1,64 @@
+﻿@model CINEMA.Models.Order
+@{
+    ViewData["Title"] = "Chi tiết vé";
+}
+
+<div class="container mt-4">
+    <h3 class="fw-bold text-center mb-4">🎟️ Chi tiết vé của bạn</h3>
+
+    <div class="card shadow-sm p-4 mb-4">
+        <h5 class="text-primary mb-3">👤 Thông tin người mua</h5>
+        <p><strong>Họ tên:</strong> @Model.Customer.FullName</p>
+        <p><strong>Email:</strong> @Model.Customer.Email</p>
+        <p><strong>Số điện thoại:</strong> @Model.Customer.Phone</p>
+    </div>
+
+    <div class="card shadow-sm p-4 mb-4">
+        <h5 class="text-danger mb-3">🎬 Thông tin phim</h5>
+        @if (Model.Tickets.Any())
+        {
+            var ticket = Model.Tickets.First();
+            <p><strong>Phim:</strong> @ticket.Showtime.Movie.Title</p>
+            <p><strong>Phòng chiếu:</strong> @ticket.Showtime.Auditorium.Name</p>
+            <p><strong>Suất chiếu:</strong> @ticket.Showtime.StartTime?.ToString("dd/MM/yyyy HH:mm")</p>
+            <p><strong>Ghế:</strong> @string.Join(", ", Model.Tickets.Select(t => t.Seat.RowLabel + t.Seat.SeatNumber))</p>
+            <p><strong>Giá vé mỗi ghế:</strong> @String.Format("{0:N0} ₫", ticket.Price)</p>
+        }
+    </div>
+
+    @if (Model.OrderCombos.Any())
+    {
+        <div class="card shadow-sm p-4 mb-4">
+            <h5 class="text-warning mb-3">🍿 Combo đã chọn</h5>
+            <table class="table table-bordered text-center">
+                <thead class="table-warning">
+                    <tr>
+                        <th>Tên combo</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model.OrderCombos)
+                    {
+                        <tr>
+                            <td>@c.Combo.Name</td>
+                            <td>@c.Quantity</td>
+                            <td>@String.Format("{0:N0} ₫", c.UnitPrice)</td>
+                            <td>@String.Format("{0:N0} ₫", c.Quantity * c.UnitPrice)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div class="card shadow-sm p-4">
+        <h5 class="text-success mb-3">💳 Thông tin thanh toán</h5>
+        <p><strong>Trạng thái:</strong> <span class="badge bg-success">@Model.Status</span></p>
+        <p><strong>Phương thức:</strong> @Model.PaymentMethod</p>
+        <p><strong>Tổng tiền:</strong> <span class="fw-bold text-danger">@String.Format("{0:N0} ₫", Model.TotalAmount)</span></p>
+        <p><strong>Ngày đặt:</strong> @Model.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+</div>

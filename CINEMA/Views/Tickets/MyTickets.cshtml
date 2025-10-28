@@ -1,0 +1,157 @@
+﻿@model IEnumerable<CINEMA.Models.Order>
+@{
+    ViewData["Title"] = "🎟️ Vé của tôi";
+}
+
+<div class="container-lg py-5">
+    <h2 class="fw-bold text-center mb-5">🎟️ Vé của tôi</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center rounded-4 border-0 shadow-sm py-4">
+            <p class="mb-0">Bạn chưa đặt vé nào. <a href="/Home" class="fw-bold text-decoration-none">Đặt vé ngay!</a></p>
+        </div>
+    }
+    else
+    {
+        @foreach (var order in Model)
+        {
+            <div class="card border-0 rounded-4 shadow-lg mb-4 overflow-hidden">
+                <!-- Simplified header with better spacing and removed inline gradient -->
+                <div class="card-header bg-primary text-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Mã đơn:</strong>
+                            <span class="font-monospace text-warning fw-bold">@("CZ" + order.OrderId.ToString("D6"))</span>
+                        </div>
+                        <small>@order.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</small>
+                    </div>
+                </div>
+
+                <div class="card-body bg-light p-4">
+                    <!-- Improved status and info layout -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <strong>🎯 Trạng thái:</strong>
+                                <span class="badge @GetStatusBadgeClass(order.Status) px-3 py-2">
+                                    @order.Status
+                                </span>
+                            </p>
+                            <p class="mb-2"><strong>💰 Tổng tiền:</strong> @String.Format("{0:N0} ₫", order.TotalAmount)</p>
+                            <p class="mb-0"><strong>💳 Phương thức:</strong> @order.PaymentMethod</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            @if (order.Status == "Chờ thanh toán" || order.Status == "Đang chờ thanh toán")
+                            {
+                                <form asp-controller="Tickets" asp-action="CancelOrder" method="post" class="d-inline">
+                                    <input type="hidden" name="orderId" value="@order.OrderId" />
+                                    <button type="submit" class="btn btn-danger btn-sm px-3"
+                                            onclick="return confirm('Bạn có chắc muốn hủy đơn này không?');">
+                                        <i class="bi bi-x-circle"></i> Hủy vé
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <!-- Tickets table with cleaner styling -->
+                    <h6 class="fw-bold text-secondary mb-3">🎬 Vé xem phim</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover text-center mb-0">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Phim</th>
+                                    <th>Suất chiếu</th>
+                                    <th>Phòng</th>
+                                    <th>Ghế</th>
+                                    <th>Tổng giá vé</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var groupedTickets = order.Tickets
+                                    .GroupBy(t => t.ShowtimeId)
+                                    .ToList();
+                                }
+
+                                @foreach (var group in groupedTickets)
+                                {
+                                    var showtime = group.FirstOrDefault()?.Showtime;
+                                    var movie = showtime?.Movie?.Title ?? "Không rõ";
+                                    var room = showtime?.Auditorium?.Name ?? "Không rõ";
+                                    var time = showtime?.StartTime?.ToString("dd/MM/yyyy HH:mm") ?? "";
+                                    var seats = string.Join(", ", group.Select(g => $"{g.Seat?.RowLabel}{g.Seat?.SeatNumber}"));
+                                    var totalPrice = group.Sum(g => g.Price ?? 0);
+                                    var status = group.FirstOrDefault()?.PaymentStatus ?? "Không rõ";
+
+                                    <tr>
+                                        <td>@movie</td>
+                                        <td>@time</td>
+                                        <td>@room</td>
+                                        <td>@seats</td>
+                                        <td>@String.Format("{0:N0} ₫", totalPrice)</td>
+                                        <td>
+                                            <span class="badge @GetStatusBadgeClass(status) px-3 py-2">
+                                                @status
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Combos section with consistent styling -->
+                    @if (order.OrderCombos != null && order.OrderCombos.Any())
+                    {
+                        <h6 class="fw-bold text-secondary mt-5 mb-3">🍿 Combo đã chọn</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover text-center mb-0">
+                                <thead class="table-warning">
+                                    <tr>
+                                        <th>Tên combo</th>
+                                        <th>Số lượng</th>
+                                        <th>Đơn giá</th>
+                                        <th>Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var oc in order.OrderCombos)
+                                    {
+                                        <tr>
+                                            <td>@oc.Combo?.Name</td>
+                                            <td>@oc.Quantity</td>
+                                            <td>@String.Format("{0:N0} ₫", oc.UnitPrice)</td>
+                                            <td>@String.Format("{0:N0} ₫", (oc.UnitPrice ?? 0) * oc.Quantity)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+
+                <!-- Action button moved to footer -->
+                <div class="card-footer bg-white border-top-0 p-3 text-end">
+                    <a asp-controller="Tickets" asp-action="Details" asp-route-id="@order.OrderId"
+                       class="btn btn-outline-primary btn-sm px-3">
+                        <i class="bi bi-eye"></i> Xem chi tiết
+                    </a>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@functions {
+    private string GetStatusBadgeClass(string status)
+    {
+        return status == "Đã thanh toán" ? "bg-success"
+            : status.Contains("chờ") ? "bg-warning text-dark"
+            : "bg-danger";
+    }
+}

@@ -42,5 +42,7 @@ namespace CINEMA.ViewModels
 
         public string PaymentMethod { get; set; }
         public string PaymentImageUrl { get; set; }
+        public decimal TicketTotal { get; set; } // ✅ chỉ tính tổng tiền vé
+
     }
 }

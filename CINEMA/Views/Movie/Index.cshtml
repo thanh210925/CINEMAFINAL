@@ -4,65 +4,173 @@
     Layout = "_AdminLayout";
 }
 
-<div class="movie-header mb-4 p-3 bg-dark text-white rounded">
-    <div class="d-flex justify-content-between align-items-center">
-        <h2 class="fw-bold">🎬 Quản lý phim</h2>
-        <a class="btn btn-success" asp-action="Create">➕ Thêm phim mới</a>
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary mb-0">
+            <i class="bi bi-film me-2"></i> Quản lý phim
+        </h2>
+        <a class="btn btn-success btn-lg shadow-sm" asp-action="Create">
+            <i class="bi bi-plus-circle me-2"></i> Thêm phim mới
+        </a>
+    </div>
+
+    <!-- Table -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="text-center">Poster</th>
+                            <th>Tên phim</th>
+                            <th>Thời lượng</th>
+                            <th>Khởi chiếu</th>
+                            <th>Quốc gia</th>
+                            <th>Ngôn ngữ</th>
+                            <th>Độ tuổi</th>
+                            <th>Trạng thái</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var m in Model)
+                            {
+                                <tr>
+                                    <!-- Poster -->
+                                    <td class="text-center">
+                                        @if (!string.IsNullOrEmpty(m.PosterUrl))
+                                        {
+                                            <img src="@m.PosterUrl" alt="@m.Title"
+                                                 class="rounded shadow-sm"
+                                                 style="width:60px; height:80px; object-fit:cover;" />
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+
+                                    <!-- Thông tin -->
+                                    <td class="fw-semibold">@m.Title</td>
+                                    <td>@(m.Duration.HasValue? m.Duration + " phút" : "-")</td>
+                                    <td>@(m.ReleaseDate.HasValue? m.ReleaseDate.Value.ToString("dd/MM/yyyy") : "-")</td>
+                                    <td>@m.Country</td>
+                                    <td>@m.Language</td>
+                                    <td>@m.AgeRating</td>
+                                    <td>
+                                        @if (m.IsActive == true)
+                                        {
+                                            <span class="badge bg-success">Đang chiếu</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Ngưng chiếu</span>
+                                        }
+                                    </td>
+
+                                    <!-- Thao tác -->
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" asp-route-id="@m.MovieId"
+                                               class="btn btn-sm btn-outline-info" title="Xem chi tiết">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@m.MovieId"
+                                               class="btn btn-sm btn-outline-warning" title="Sửa phim">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@m.MovieId"
+                                               class="btn btn-sm btn-outline-danger"
+                                               onclick="return confirm('Xác nhận xóa phim @m.Title ?');"
+                                               title="Xóa phim">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+
+                                            @if (!string.IsNullOrEmpty(m.TrailerUrl))
+                                            {
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        title="Xem trailer"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#trailerModal"
+                                                        data-trailer="@m.TrailerUrl"
+                                                        data-title="@m.Title">
+                                                    <i class="bi bi-play-circle"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="9" class="text-center py-4 text-muted">
+                                    📭 Chưa có phim nào trong hệ thống
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="table-responsive bg-white shadow rounded p-3">
-    <table class="table table-hover align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Tên phim</th>
-                <th>Thời lượng</th>
-                <th>Ngày khởi chiếu</th>
-                <th>Quốc gia</th>
-                <th>Ngôn ngữ</th>
-                <th>Giới hạn tuổi</th>
-                <th>Trạng thái</th>
-                <th>Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model != null && Model.Any())
-            {
-                foreach (var m in Model)
-                {
-                    <tr>
-                        <td>#@m.MovieId</td>
-                        <td>@m.Title</td>
-                        <td>@(m.Duration.HasValue? m.Duration + " phút" : "-")</td>
-                        <td>@(m.ReleaseDate.HasValue? m.ReleaseDate.Value.ToString("dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : "-")</td>
-                        <td>@m.Country</td>
-                        <td>@m.Language</td>
-                        <td>@m.AgeRating</td>
-                        <td>
-                            @if (m.IsActive == true)
-                            {
-                                <span class="badge bg-success">Đang chiếu</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">Ngưng chiếu</span>
-                            }
-                        </td>
-                        <td>
-                            <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@m.MovieId">Xem</a>
-                            <a class="btn btn-warning btn-sm" asp-action="Edit" asp-route-id="@m.MovieId">Sửa</a>
-                            <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@m.MovieId">Xóa</a>
-                        </td>
-                    </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="9" class="text-center text-muted">📭 Chưa có phim nào</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<!-- 🎥 Modal Trailer -->
+<div class="modal fade" id="trailerModal" tabindex="-1" aria-labelledby="trailerLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="trailerLabel">🎞 Trailer phim</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="ratio ratio-16x9">
+                    <iframe id="trailerFrame" src="" allowfullscreen class="rounded-bottom border-0"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('trailerModal');
+            const frame = document.getElementById('trailerFrame');
+            const title = document.getElementById('trailerLabel');
+
+            modal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const trailerUrl = button.getAttribute('data-trailer');
+                const movieTitle = button.getAttribute('data-title');
+                let embedUrl = "";
+
+                // ✅ Nhận diện YouTube hoặc file MP4
+                if (trailerUrl.includes("youtube.com") || trailerUrl.includes("youtu.be")) {
+                    let videoId = "";
+                    if (trailerUrl.includes("v="))
+                        videoId = trailerUrl.split("v=")[1].split("&")[0];
+                    else if (trailerUrl.includes("youtu.be/"))
+                        videoId = trailerUrl.split("youtu.be/")[1].split("?")[0];
+                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                }
+                else {
+                    embedUrl = trailerUrl;
+                }
+
+                frame.src = embedUrl;
+                title.textContent = `🎬 Trailer – ${movieTitle}`;
+            });
+
+            modal.addEventListener('hidden.bs.modal', function () {
+                frame.src = ""; // Dừng video khi đóng
+            });
+        });
+    </script>
+}

@@ -8,7 +8,7 @@
 }
 
 <div class="container py-4">
-    <!-- Header -->
+    <!-- 🎟️ Header -->
     <div class="mb-4">
         <h2 class="fw-bold mb-1">
             <i class="bi bi-ticket-perforated-fill text-danger me-2"></i>
@@ -17,7 +17,7 @@
         <p class="text-muted mb-0">Chọn vé, ghế và combo của bạn</p>
     </div>
 
-    <!-- Thông tin phim -->
+    <!-- 🎬 Thông tin phim -->
     <div class="card mb-4 shadow-sm border-0 overflow-hidden">
         <div class="row g-0">
             <div class="col-md-4 bg-dark">
@@ -36,6 +36,24 @@
                     <p><strong>Giới hạn tuổi:</strong> @Model.AgeRating</p>
                     <p class="text-muted">@Model.Description</p>
 
+                    <!-- 🎥 Nút xem trailer -->
+                    @if (!string.IsNullOrEmpty(Model.TrailerUrl))
+                    {
+                        <button type="button"
+                                class="btn btn-outline-danger fw-bold mt-2"
+                                data-bs-toggle="modal"
+                                data-bs-target="#trailerModal"
+                                data-trailer="@Model.TrailerUrl"
+                                data-title="@Model.Title">
+                            🎥 Xem trailer
+                        </button>
+                    }
+                    else
+                    {
+                        <p class="text-muted fst-italic mt-2">🎬 Chưa có trailer cho phim này.</p>
+                    }
+
+                    <!-- 📅 Suất chiếu -->
                     @if (showtime != null)
                     {
                         <div class="bg-light rounded p-3 mt-3">
@@ -50,7 +68,7 @@
                     }
                     else
                     {
-                        <div class="alert alert-warning">
+                        <div class="alert alert-warning mt-3">
                             <i class="bi bi-exclamation-triangle me-2"></i>
                             Vui lòng chọn suất chiếu để xem chi tiết.
                         </div>
@@ -60,17 +78,16 @@
         </div>
     </div>
 
-    <!-- Form đặt vé -->
-    @* ✅ Cập nhật form trỏ đến PaymentController.Index *@
+    <!-- 🧾 Form đặt vé -->
     <form asp-controller="Payment" asp-action="Index" method="post">
         <input type="hidden" name="MovieId" value="@Model.MovieId" />
         <input type="hidden" name="ShowtimeId" value="@showtime?.ShowtimeId" />
         <input type="hidden" id="basePrice" name="BasePrice" value="@basePrice" />
         <input type="hidden" id="TotalPriceHidden" name="TotalPrice" value="0" />
 
-        <!-- Chọn loại vé -->
+        <!-- 🎫 Chọn loại vé -->
         <div class="card mb-4 shadow-sm border-0">
-            <div class="card-header bg-white border-bottom py-3 fw-bold">
+            <div class="card-header bg-white fw-bold">
                 <i class="bi bi-ticket-detailed text-primary me-2"></i> Chọn loại vé
             </div>
             <div class="card-body row g-4">
@@ -89,13 +106,12 @@
             </div>
         </div>
 
-        <!-- Chọn ghế -->
+        <!-- 💺 Chọn ghế -->
         <div class="card mb-4 shadow-sm border-0">
-            <div class="card-header bg-white border-bottom py-3 fw-bold">
+            <div class="card-header bg-white fw-bold">
                 <i class="bi bi-grid-3x3 text-danger me-2"></i> Chọn ghế ngồi
                 <small class="text-muted d-block">Chọn đúng số lượng ghế theo số vé đã chọn</small>
             </div>
-
             <div class="card-body">
                 <div class="text-center mb-4">
                     <div class="bg-dark text-white px-5 py-2 rounded-pill">Màn hình</div>
@@ -118,7 +134,6 @@
                             {
                                 @:</div>
                             }
-
                             currentRow = seat.RowLabel;
                             @:<div class="d-flex justify-content-center align-items-center mb-2">
                             @:<span class="badge bg-secondary me-2">@currentRow</span>
@@ -149,9 +164,9 @@
             </div>
         </div>
 
-        <!-- Chọn combo -->
+        <!-- 🍿 Chọn combo -->
         <div class="card mb-4 shadow-sm border-0">
-            <div class="card-header bg-white border-bottom py-3 fw-bold">
+            <div class="card-header bg-white fw-bold">
                 <i class="bi bi-cup-straw text-warning me-2"></i> Chọn combo
             </div>
             <div class="card-body">
@@ -170,7 +185,8 @@
                                         <h6 class="fw-bold">@combo.Name</h6>
                                         <p class="text-muted small">@combo.Description</p>
                                         <p class="fw-bold text-danger">@combo.Price?.ToString("N0") đ</p>
-                                        <input type="number" class="form-control combo-input"
+                                        <input type="number"
+                                               class="form-control combo-input"
                                                name="Combo_@combo.ComboId"
                                                min="0" value="0"
                                                data-price="@combo.Price" />
@@ -187,7 +203,7 @@
             </div>
         </div>
 
-        <!-- Tổng tiền + Xác nhận -->
+        <!-- 💳 Tổng tiền -->
         <div class="card shadow border-0 sticky-bottom">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
@@ -202,67 +218,108 @@
     </form>
 </div>
 
+<!-- 🎥 Modal Trailer -->
+<div class="modal fade" id="trailerModal" tabindex="-1" aria-labelledby="trailerLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="trailerLabel">🎬 Trailer phim</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="ratio ratio-16x9">
+                    <iframe id="trailerFrame" src="" allowfullscreen class="border-0"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
-    <script>
-        function calcTotal() {
-            const basePrice = parseFloat(document.getElementById("basePrice").value) || 0;
-            let adult = parseInt(document.getElementsByName("AdultTickets")[0].value) || 0;
-            let child = parseInt(document.getElementsByName("ChildTickets")[0].value) || 0;
-            let student = parseInt(document.getElementsByName("StudentTickets")[0].value) || 0;
+<script>
+function calcTotal() {
+    const basePrice = parseFloat(document.getElementById("basePrice").value) || 0;
+    let adult = parseInt(document.getElementsByName("AdultTickets")[0].value) || 0;
+    let child = parseInt(document.getElementsByName("ChildTickets")[0].value) || 0;
+    let student = parseInt(document.getElementsByName("StudentTickets")[0].value) || 0;
+    let total = adult * basePrice + child * (basePrice * 0.7) + student * (basePrice * 0.8);
 
-            let total = adult * basePrice + child * (basePrice * 0.7) + student * (basePrice * 0.8);
+    document.querySelectorAll(".combo-input").forEach(el => {
+        let qty = parseInt(el.value) || 0;
+        let price = parseFloat(el.dataset.price) || 0;
+        total += qty * price;
+    });
 
-            document.querySelectorAll(".combo-input").forEach(el => {
-                let qty = parseInt(el.value) || 0;
-                let price = parseFloat(el.dataset.price) || 0;
-                total += qty * price;
-            });
+    document.getElementById("totalPrice").innerText = total.toLocaleString("vi-VN");
+    document.getElementById("TotalPriceHidden").value = total;
+}
 
-            document.getElementById("totalPrice").innerText = total.toLocaleString("vi-VN");
-            document.getElementById("TotalPriceHidden").value = total;
-        }
+function limitSeats() {
+    let adult = parseInt(document.getElementsByName("AdultTickets")[0].value) || 0;
+    let child = parseInt(document.getElementsByName("ChildTickets")[0].value) || 0;
+    let student = parseInt(document.getElementsByName("StudentTickets")[0].value) || 0;
+    let maxSeats = adult + child + student;
+    let checkedSeats = document.querySelectorAll(".seat-checkbox:checked");
+    if (checkedSeats.length > maxSeats) {
+        alert("Bạn chỉ được chọn " + maxSeats + " ghế theo số vé đã chọn!");
+        checkedSeats[checkedSeats.length - 1].checked = false;
+    }
+}
 
-        function limitSeats() {
-            let adult = parseInt(document.getElementsByName("AdultTickets")[0].value) || 0;
-            let child = parseInt(document.getElementsByName("ChildTickets")[0].value) || 0;
-            let student = parseInt(document.getElementsByName("StudentTickets")[0].value) || 0;
-            let maxSeats = adult + child + student;
-
-            let checkedSeats = document.querySelectorAll(".seat-checkbox:checked");
-            if (checkedSeats.length > maxSeats) {
-                alert("Bạn chỉ được chọn " + maxSeats + " ghế theo số vé đã chọn!");
-                checkedSeats[checkedSeats.length - 1].checked = false;
-            }
-        }
-
-        document.querySelectorAll(".seat-checkbox").forEach(cb => {
-            cb.addEventListener("change", function () {
-                const badge = this.nextElementSibling;
-                if (this.checked) {
-                    badge.classList.remove("bg-secondary");
-                    badge.classList.add("bg-success");
-                } else {
-                    badge.classList.remove("bg-success");
-                    badge.classList.add("bg-secondary");
-                }
-                limitSeats();
-                calcTotal();
-            });
-        });
-
-        document.querySelectorAll(".ticket-input, .combo-input").forEach(el => {
-            el.addEventListener("input", calcTotal);
-        });
-
-        let timeLeft = 600;
-        setInterval(() => {
-            if (timeLeft <= 0) return;
-            timeLeft--;
-            let m = Math.floor(timeLeft / 60);
-            let s = timeLeft % 60;
-            document.getElementById("countdown").innerText = `${m}:${s.toString().padStart(2, '0')}`;
-        }, 1000);
-
+document.querySelectorAll(".seat-checkbox").forEach(cb => {
+    cb.addEventListener("change", function () {
+        const badge = this.nextElementSibling;
+        badge.classList.toggle("bg-success", this.checked);
+        badge.classList.toggle("bg-secondary", !this.checked);
+        limitSeats();
         calcTotal();
-    </script>
+    });
+});
+
+document.querySelectorAll(".ticket-input, .combo-input").forEach(el => {
+    el.addEventListener("input", calcTotal);
+});
+
+let timeLeft = 600;
+setInterval(() => {
+    if (timeLeft <= 0) return;
+    timeLeft--;
+    let m = Math.floor(timeLeft / 60);
+    let s = timeLeft % 60;
+    document.getElementById("countdown").innerText = `${m}:${s.toString().padStart(2, '0')}`;
+}, 1000);
+
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('trailerModal');
+    const frame = document.getElementById('trailerFrame');
+    const title = document.getElementById('trailerLabel');
+
+    modal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const trailerUrl = button.getAttribute('data-trailer');
+        const movieTitle = button.getAttribute('data-title');
+        let embedUrl = "";
+
+        if (trailerUrl.includes("youtube.com") || trailerUrl.includes("youtu.be")) {
+            let videoId = "";
+            if (trailerUrl.includes("v=")) videoId = trailerUrl.split("v=")[1].split("&")[0];
+            else if (trailerUrl.includes("youtu.be/")) videoId = trailerUrl.split("youtu.be/")[1].split("?")[0];
+            embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+        } else if (trailerUrl.endsWith(".mp4")) {
+            embedUrl = trailerUrl;
+        } else {
+            embedUrl = trailerUrl;
+        }
+
+        frame.src = embedUrl;
+        title.textContent = `🎬 Trailer – ${movieTitle}`;
+    });
+
+    modal.addEventListener('hidden.bs.modal', function () {
+        frame.src = "";
+    });
+});
+
+calcTotal();
+</script>
 }

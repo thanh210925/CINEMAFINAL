@@ -1,0 +1,141 @@
+﻿@model CINEMA.Models.Order
+@{
+    ViewData["Title"] = "Chi tiết vé";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-5 mb-5">
+    <h2 class="fw-bold text-center text-gradient mb-4">
+        🎟️ Chi tiết vé @("CZ" + Model.OrderId.ToString("D6"))
+    </h2>
+
+    <!-- 👤 Thông tin người mua -->
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+        <h5 class="text-primary mb-3 fw-bold">👤 Thông tin người mua</h5>
+        <p><strong>Họ tên:</strong> @Model.Customer?.FullName</p>
+        <p><strong>Email:</strong> @Model.Customer?.Email</p>
+        <p><strong>Số điện thoại:</strong> @Model.Customer?.Phone</p>
+    </div>
+
+    <!-- 🎬 Thông tin vé xem phim -->
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+        <h5 class="text-danger mb-3 fw-bold">🎬 Thông tin vé xem phim</h5>
+
+        @if (Model.Tickets != null && Model.Tickets.Any())
+        {
+            var ticket = Model.Tickets.First();
+            <p><strong>Phim:</strong> @ticket.Showtime?.Movie?.Title</p>
+            <p><strong>Phòng chiếu:</strong> @ticket.Showtime?.Auditorium?.Name</p>
+            <p><strong>Suất chiếu:</strong> @ticket.Showtime?.StartTime?.ToString("dd/MM/yyyy HH:mm")</p>
+            <p>
+                <strong>Ghế đã chọn:</strong>
+                <span class="fw-bold text-primary">
+                    @string.Join(", ", Model.Tickets.Select(t => t.Seat.RowLabel + t.Seat.SeatNumber))
+                </span>
+            </p>
+            <p><strong>Giá vé mỗi ghế:</strong> @String.Format("{0:N0} ₫", ticket.Price)</p>
+        }
+        else
+        {
+            <p class="text-muted">Không có vé nào trong đơn này.</p>
+        }
+    </div>
+
+    <!-- 🍿 Combo -->
+    @if (Model.OrderCombos != null && Model.OrderCombos.Any())
+    {
+        <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+            <h5 class="text-warning mb-3 fw-bold">🍿 Combo đã chọn</h5>
+            <table class="table table-bordered text-center align-middle bg-white rounded-3 shadow-sm">
+                <thead class="table-warning">
+                    <tr>
+                        <th>Tên combo</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model.OrderCombos)
+                    {
+                        <tr>
+                            <td>@c.Combo?.Name</td>
+                            <td>@c.Quantity</td>
+                            <td>@String.Format("{0:N0} ₫", c.UnitPrice)</td>
+                            <td>@String.Format("{0:N0} ₫", (c.Quantity * (c.UnitPrice ?? 0)))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <!-- 💳 Thông tin thanh toán -->
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+        <h5 class="text-success mb-3 fw-bold">💳 Thông tin thanh toán</h5>
+
+        <p>
+            <strong>Trạng thái:</strong>
+            <span class="badge bg-@(
+                Model.Status == "Đã thanh toán" ? "success" :
+                Model.Status.Contains("chờ") ? "warning text-dark" : "secondary"
+            ) px-3 py-2">
+                @Model.Status
+            </span>
+        </p>
+
+        <p><strong>Phương thức:</strong> @Model.PaymentMethod</p>
+        <p><strong>Tổng tiền:</strong> <span class="fw-bold text-danger">@String.Format("{0:N0} ₫", Model.TotalAmount)</span></p>
+        <p><strong>Ngày đặt:</strong> @Model.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+
+    <!-- ⚙️ Cập nhật trạng thái hoặc Hủy vé -->
+    <div class="card shadow-sm border-0 rounded-4 p-4">
+        <h5 class="text-secondary mb-3 fw-bold">⚙️ Quản lý vé</h5>
+
+        @if (Model.Status == "Chờ thanh toán" || Model.Status == "Đang chờ thanh toán")
+        {
+            <form asp-action="CancelOrder" method="post">
+                <input type="hidden" name="orderId" value="@Model.OrderId" />
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc muốn hủy vé này không?');">
+                    ❌ Hủy vé
+                </button>
+            </form>
+        }
+
+        <form asp-action="UpdateStatus" method="post" class="mt-3">
+            <input type="hidden" name="orderId" value="@Model.OrderId" />
+            <div class="d-flex align-items-center gap-2">
+                <select name="newStatus" class="form-select w-auto">
+                    <option value="Đang chờ thanh toán" selected>Đang chờ thanh toán</option>
+                    <option value="Đã thanh toán">Đã thanh toán</option>
+                    <option value="Đã hủy">Đã hủy</option>
+                </select>
+                <button class="btn btn-success">💾 Cập nhật</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="text-center mt-4">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Quay lại danh sách vé
+        </a>
+    </div>
+</div>
+
+<style>
+.text-gradient {
+    background: linear-gradient(90deg, #007bff, #6610f2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.card {
+    transition: all 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-3px);
+}
+table th, table td {
+    vertical-align: middle !important;
+}
+</style>

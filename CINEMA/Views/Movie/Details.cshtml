@@ -4,22 +4,125 @@
     Layout = "_AdminLayout";
 }
 
-<h2 class="fw-bold mb-4">🎬 Chi tiết phim</h2>
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4 text-gradient">🎬 Chi tiết phim</h2>
 
-<div class="card p-4 shadow-sm">
-    <p><b>ID:</b> @Model.MovieId</p>
-    <p><b>Tên phim:</b> @Model.Title</p>
-    <p><b>Thời lượng:</b> @(Model.Duration.HasValue? Model.Duration + " phút" : "-")</p>
-    <p><b>Ngày khởi chiếu:</b> @(Model.ReleaseDate.HasValue? Model.ReleaseDate.Value.ToString("dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : "-")</p>
-    <p><b>Quốc gia:</b> @Model.Country</p>
-    <p><b>Ngôn ngữ:</b> @Model.Language</p>
-    <p><b>Giới hạn tuổi:</b> @Model.AgeRating</p>
-    <p><b>Trạng thái:</b> @(Model.IsActive == true ? "Đang chiếu" : "Ngưng chiếu")</p>
-    <p><b>Mô tả:</b> @Model.Description</p>
-    @if (!string.IsNullOrEmpty(Model.PosterUrl))
-    {
-        <img src="@Model.PosterUrl" alt="@Model.Title" style="max-width:200px;" />
-    }
+    <div class="card p-4 shadow-sm border-0 rounded-4">
+        <div class="row g-4">
+            <!-- Poster -->
+            <div class="col-md-4 text-center">
+                @if (!string.IsNullOrEmpty(Model.PosterUrl))
+                {
+                    <img src="@Model.PosterUrl" alt="@Model.Title" class="rounded shadow-sm w-100" style="max-height: 420px; object-fit: cover;" />
+                }
+                else
+                {
+                    <div class="bg-light text-muted py-5 rounded">Chưa có poster</div>
+                }
+            </div>
+
+            <!-- Thông tin phim -->
+            <div class="col-md-8">
+                <h3 class="fw-bold mb-3">@Model.Title</h3>
+                <p><b>⏱ Thời lượng:</b> @(Model.Duration.HasValue? Model.Duration + " phút" : "-")</p>
+                <p><b>📅 Ngày khởi chiếu:</b> @(Model.ReleaseDate.HasValue? Model.ReleaseDate.Value.ToString("dd/MM/yyyy") : "-")</p>
+                <p><b>🌍 Quốc gia:</b> @Model.Country</p>
+                <p><b>🗣 Ngôn ngữ:</b> @Model.Language</p>
+                <p><b>🔞 Giới hạn tuổi:</b> @Model.AgeRating</p>
+                <p>
+                    <b>🎞 Trạng thái:</b>
+                    <span class="badge bg-@(Model.IsActive == true ? "success" : "secondary")">
+                        @(Model.IsActive == true ? "Đang chiếu" : "Ngưng chiếu")
+                    </span>
+                </p>
+                <p class="mt-3"><b>📝 Mô tả:</b><br />@Model.Description</p>
+
+                <!-- 🎥 Trailer -->
+                @if (!string.IsNullOrEmpty(Model.TrailerUrl))
+                {
+                    <button type="button"
+                            class="btn btn-outline-danger fw-bold mt-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#trailerModal"
+                            data-trailer="@Model.TrailerUrl"
+                            data-title="@Model.Title">
+                        🎥 Xem trailer
+                    </button>
+                }
+                else
+                {
+                    <p class="text-muted fst-italic mt-3">🎬 Chưa có trailer cho phim này.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <a asp-action="Index" class="btn btn-secondary mt-4">
+        <i class="bi bi-arrow-left"></i> Quay lại
+    </a>
 </div>
 
-<a asp-action="Index" class="btn btn-secondary mt-3">Quay lại</a>
+<!-- 🎬 Modal Trailer -->
+<div class="modal fade" id="trailerModal" tabindex="-1" aria-labelledby="trailerLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 overflow-hidden">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="trailerLabel">🎬 Trailer phim</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="ratio ratio-16x9">
+                    <iframe id="trailerFrame" src="" allowfullscreen class="border-0"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('trailerModal');
+            const frame = document.getElementById('trailerFrame');
+            const title = document.getElementById('trailerLabel');
+
+            modal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const trailerUrl = button.getAttribute('data-trailer');
+                const movieTitle = button.getAttribute('data-title');
+                let embedUrl = "";
+
+                // 🔹 Nếu là YouTube
+                if (trailerUrl.includes("youtube.com") || trailerUrl.includes("youtu.be")) {
+                    let videoId = "";
+                    if (trailerUrl.includes("v=")) videoId = trailerUrl.split("v=")[1].split("&")[0];
+                    else if (trailerUrl.includes("youtu.be/")) videoId = trailerUrl.split("youtu.be/")[1].split("?")[0];
+                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                }
+                // 🔹 Nếu là .mp4
+                else if (trailerUrl.endsWith(".mp4")) {
+                    embedUrl = trailerUrl;
+                }
+                // 🔹 Link khác
+                else {
+                    embedUrl = trailerUrl;
+                }
+
+                frame.src = embedUrl;
+                title.textContent = `🎥 Trailer – ${movieTitle}`;
+            });
+
+            modal.addEventListener('hidden.bs.modal', function () {
+                frame.src = ""; // Dừng video khi đóng
+            });
+        });
+    </script>
+}
+
+<style>
+    .text-gradient {
+        background: linear-gradient(90deg, #007bff, #6610f2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+</style>
