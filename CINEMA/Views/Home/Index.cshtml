@@ -98,31 +98,6 @@
     </div>
 </section>
 
-<!-- 🍿 PHIM SẮP CHIẾU -->
-<section class="container my-5">
-    <h2 class="fw-bold text-center mb-5 text-gradient">🍿 PHIM SẮP CHIẾU</h2>
-    <div class="row g-4">
-        @foreach (var movie in Model.Where(m => m.IsActive == false))
-        {
-            <div class="col-md-3 col-sm-6">
-                <div class="movie-card upcoming-card h-100 shadow-sm border-0">
-                    <div class="position-relative">
-                        <img src="@movie.PosterUrl" class="card-img-top rounded-top-4" alt="@movie.Title">
-                        <div class="ribbon">COMING SOON</div>
-                    </div>
-                    <div class="card-body text-center">
-                        <h5 class="fw-bold">@movie.Title</h5>
-                        <p class="text-muted small">@movie.Duration phút | @movie.Country</p>
-                        <span class="badge bg-secondary">
-                            Khởi chiếu: @movie.ReleaseDate?.ToString("dd/MM/yyyy")
-                        </span>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-</section>
-
 <!-- CSS -->
 <link rel="stylesheet" href="~/css/site-home.css" />
 

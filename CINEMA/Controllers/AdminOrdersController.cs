@@ -15,7 +15,7 @@ namespace CINEMA.Controllers
             _context = context;
         }
 
-        // =================== [1] Danh sách đơn hàng ===================
+        // =================== [1] DANH SÁCH ĐƠN HÀNG ===================
         public async Task<IActionResult> Index(string search, string status)
         {
             var orders = _context.Orders
@@ -25,11 +25,19 @@ namespace CINEMA.Controllers
                     .ThenInclude(oc => oc.Combo)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(search))
-                orders = orders.Where(o => o.Customer.FullName.Contains(search) || o.OrderId.ToString().Contains(search));
+            // 🔍 Tìm theo tên khách hàng hoặc mã đơn
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                orders = orders.Where(o =>
+                    (o.Customer != null && o.Customer.FullName.Contains(search)) ||
+                    o.OrderId.ToString().Contains(search));
+            }
 
-            if (!string.IsNullOrEmpty(status))
+            // 🔍 Lọc theo trạng thái
+            if (!string.IsNullOrWhiteSpace(status))
+            {
                 orders = orders.Where(o => o.Status == status);
+            }
 
             var list = await orders
                 .OrderByDescending(o => o.CreatedAt)
@@ -38,7 +46,7 @@ namespace CINEMA.Controllers
             return View(list);
         }
 
-        // =================== [2] Xem chi tiết đơn hàng ===================
+        // =================== [2] XEM CHI TIẾT ĐƠN HÀNG ===================
         public async Task<IActionResult> Details(int id)
         {
             var order = await _context.Orders
@@ -58,27 +66,39 @@ namespace CINEMA.Controllers
             return View(order);
         }
 
-        // =================== [3] Cập nhật trạng thái đơn hàng ===================
+        // =================== [3] CẬP NHẬT TRẠNG THÁI (AJAX HOẶC POST FORM) ===================
         [HttpPost]
-        public async Task<IActionResult> UpdateStatus(int orderId, string newStatus)
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] string status)
         {
-            var order = await _context.Orders.FindAsync(orderId);
+            if (string.IsNullOrWhiteSpace(status))
+                return BadRequest("⚠️ Trạng thái không hợp lệ.");
+
+            var order = await _context.Orders
+                .Include(o => o.Tickets)
+                .FirstOrDefaultAsync(o => o.OrderId == id);
+
             if (order == null)
                 return NotFound();
 
-            order.Status = newStatus;
-            foreach (var ticket in _context.Tickets.Where(t => t.OrderId == orderId))
+            // ✅ Cập nhật trạng thái đơn hàng
+            order.Status = status;
+
+            // ✅ Cập nhật trạng thái vé (nếu có)
+            foreach (var ticket in order.Tickets)
             {
-                ticket.Status = newStatus;
-                ticket.PaymentStatus = newStatus;
+                ticket.Status = status;
             }
 
             await _context.SaveChangesAsync();
-            TempData["Success"] = $"Đơn hàng #{orderId} đã được cập nhật trạng thái: {newStatus}.";
-            return RedirectToAction(nameof(Index));
+
+            return Ok(new
+            {
+                success = true,
+                message = $"Đã cập nhật trạng thái đơn hàng #{id} thành '{status}'"
+            });
         }
 
-        // =================== [4] Xóa đơn hàng ===================
+        // =================== [4] XÓA ĐƠN HÀNG ===================
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
@@ -90,13 +110,14 @@ namespace CINEMA.Controllers
             if (order == null)
                 return NotFound();
 
+            // Xóa vé và combo liên quan
             _context.Tickets.RemoveRange(order.Tickets);
             _context.OrderCombos.RemoveRange(order.OrderCombos);
             _context.Orders.Remove(order);
 
             await _context.SaveChangesAsync();
-            TempData["Success"] = $"Đã xóa đơn hàng #{id}.";
 
+            TempData["Success"] = $"✅ Đã xóa đơn hàng #{id}.";
             return RedirectToAction(nameof(Index));
         }
     }

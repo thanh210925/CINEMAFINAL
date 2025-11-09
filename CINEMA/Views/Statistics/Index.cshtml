@@ -1,0 +1,227 @@
+﻿@model CINEMA.ViewModels.RevenueDashboardViewModel
+@{
+    ViewData["Title"] = "Thống kê doanh thu";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4 text-center text-gradient">📊 Thống kê doanh thu</h2>
+
+    <!-- 🔹 Bộ lọc thời gian -->
+    <form method="get" class="row g-3 mb-4 justify-content-center">
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Từ ngày</label>
+            <input type="date" name="from" class="form-control"
+                   value="@(Model.FromDate?.ToString("yyyy-MM-dd"))" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Đến ngày</label>
+            <input type="date" name="to" class="form-control"
+                   value="@(Model.ToDate?.ToString("yyyy-MM-dd"))" />
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100 fw-semibold">Lọc</button>
+        </div>
+    </form>
+
+    <!-- 🔹 Thẻ tổng quan -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-2">
+            <div class="p-3 rounded-4 shadow-sm bg-light text-center">
+                <div class="text-muted">Doanh thu hôm nay</div>
+                <div class="fs-4 fw-bold text-success">@Model.TodayRevenue.ToString("N0") ₫</div>
+                <div class="small text-secondary">@Model.TodayTickets vé</div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="p-3 rounded-4 shadow-sm bg-light text-center">
+                <div class="text-muted">Doanh thu tháng này</div>
+                <div class="fs-4 fw-bold text-success">@Model.MonthRevenue.ToString("N0") ₫</div>
+                <div class="small text-secondary">@Model.MonthTickets vé</div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="p-3 rounded-4 shadow-sm bg-light text-center">
+                <div class="text-muted">Tổng doanh thu</div>
+                <div class="fs-4 fw-bold text-danger">@Model.TotalRevenue.ToString("N0") ₫</div>
+                <div class="small text-secondary">@Model.TotalTickets vé</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 rounded-4 shadow-sm bg-light text-center">
+                <div class="text-muted">🥤 Doanh thu combo bắp nước</div>
+                <div class="fs-4 fw-bold text-success">@Model.ComboRevenue.ToString("N0") ₫</div>
+                <div class="small text-secondary">@Model.ComboSold combo đã bán</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 rounded-4 shadow-sm bg-light text-center">
+                <div class="text-muted">Khoảng lọc hiện tại</div>
+                <div class="small fw-semibold">
+                    @if (Model.FromDate.HasValue || Model.ToDate.HasValue)
+                    {
+                        <span>@Model.FromDate?.ToString("dd/MM/yyyy") - @Model.ToDate?.ToString("dd/MM/yyyy")</span>
+                    }
+                    else
+                    {
+                        <span>Toàn thời gian</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔹 Biểu đồ doanh thu -->
+    <div class="row g-4">
+        <div class="col-md-8">
+            <div class="p-3 rounded-4 shadow-sm bg-white">
+                <h5 class="fw-semibold mb-3">📅 Doanh thu & số vé theo ngày</h5>
+                <canvas id="revenueByDateChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 rounded-4 shadow-sm bg-white">
+                <h5 class="fw-semibold mb-3">🎬 Top 5 phim doanh thu cao</h5>
+                <canvas id="revenueByMovieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔹 Theo tháng / năm -->
+    <div class="row g-4 mt-4">
+        <div class="col-md-6">
+            <div class="p-3 rounded-4 shadow-sm bg-white">
+                <h5 class="fw-semibold mb-3">📆 Doanh thu & số vé theo tháng</h5>
+                <canvas id="revenueByMonthChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="p-3 rounded-4 shadow-sm bg-white">
+                <h5 class="fw-semibold mb-3">📊 Doanh thu & số vé theo năm</h5>
+                <canvas id="revenueByYearChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔹 Combo -->
+    <div class="row g-4 mt-4">
+        <div class="col-md-12">
+            <div class="p-3 rounded-4 shadow-sm bg-white">
+                <h5 class="fw-semibold mb-3">🥤 Combo bắp nước theo tháng</h5>
+                <canvas id="comboByMonthChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 🔹 BIỂU ĐỒ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // ======== DỮ LIỆU ========
+    const labelsByDate = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LabelsByDate));
+    const revenueByDate = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueByDate));
+    const ticketCountByDate = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TicketCountByDate));
+
+    const labelsByMonth = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LabelsByMonth));
+    const revenueByMonth = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueByMonth));
+    const ticketCountByMonth = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TicketCountByMonth));
+
+    const labelsByYear = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LabelsByYear));
+    const revenueByYear = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueByYear));
+    const ticketCountByYear = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TicketCountByYear));
+
+    const movieLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MovieLabels));
+    const revenueByMovie = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueByMovie));
+
+    const comboLabelsByMonth = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ComboLabelsByMonth));
+    const comboRevenueByMonth = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ComboRevenueByMonth));
+    const comboQuantityByMonth = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ComboQuantityByMonth));
+
+    // ======== HÀM VẼ CHART 2 CỘT (Doanh thu & Vé) ========
+    function createRevenueTicketChart(ctx, labels, revenueData, ticketData, color1, color2) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Doanh thu (VNĐ)',
+                        data: revenueData,
+                        backgroundColor: color1,
+                        yAxisID: 'y',
+                        barPercentage: 0.4,
+                        categoryPercentage: 0.5
+                    },
+                    {
+                        label: 'Số vé bán',
+                        data: ticketData,
+                        backgroundColor: color2,
+                        yAxisID: 'y1',
+                        barPercentage: 0.4,
+                        categoryPercentage: 0.5
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                stacked: false,
+                scales: {
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        title: { display: true, text: 'Doanh thu (VNĐ)' },
+                        ticks: { callback: v => v.toLocaleString('vi-VN') }
+                    },
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        grid: { drawOnChartArea: false },
+                        title: { display: true, text: 'Số vé bán' }
+                    }
+                }
+            }
+        });
+    }
+
+    // ======== VẼ CÁC BIỂU ĐỒ ========
+    createRevenueTicketChart(document.getElementById('revenueByDateChart'), labelsByDate, revenueByDate, ticketCountByDate, 'rgba(54,162,235,0.7)', 'rgba(255,206,86,0.7)');
+    createRevenueTicketChart(document.getElementById('revenueByMonthChart'), labelsByMonth, revenueByMonth, ticketCountByMonth, 'rgba(153,102,255,0.7)', 'rgba(255,159,64,0.7)');
+    createRevenueTicketChart(document.getElementById('revenueByYearChart'), labelsByYear, revenueByYear, ticketCountByYear, 'rgba(75,192,192,0.7)', 'rgba(255,99,132,0.7)');
+
+    // 🎬 Top 5 phim doanh thu cao
+    new Chart(document.getElementById('revenueByMovieChart'), {
+        type: 'pie',
+        data: {
+            labels: movieLabels,
+            datasets: [{
+                data: revenueByMovie,
+                backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF']
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // 🥤 Combo bắp nước theo tháng
+    createRevenueTicketChart(document.getElementById('comboByMonthChart'), comboLabelsByMonth, comboRevenueByMonth, comboQuantityByMonth, 'rgba(75,192,192,0.7)', 'rgba(255,206,86,0.7)');
+</script>
+
+<style>
+    body {
+        background: linear-gradient(to right, #e3f2fd, #fde2e2);
+    }
+
+    .text-gradient {
+        background: linear-gradient(90deg, #007bff, #6610f2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    canvas {
+        max-height: 400px;
+    }
+
+    h5 {
+        color: #495057;
+    }
+</style>

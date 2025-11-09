@@ -12,19 +12,20 @@
 
     <!-- Dashboard Cards -->
     <div class="row g-4">
-        <!-- Quản lý Phim -->
+        <!-- Quản lý Phòng chiếu -->
         <div class="col-md-4">
-            <div class="card dashboard-card green">
+            <div class="card dashboard-card blue">
                 <div class="card-body text-center text-white">
-                    <div class="icon">🎬</div>
-                    <h5 class="card-title">Quản lý Phim</h5>
+                    <div class="icon">🏛️</div>
+                    <h5 class="card-title">Quản lý Rạp</h5>
                     <div class="btn-group-custom">
-                        <a asp-controller="Movie" asp-action="Index" class="btn btn-light">Xem Phim</a>
-                        <a asp-controller="Movie" asp-action="Create" class="btn btn-outline-light">Thêm Phim</a>
+                        <a asp-controller="Theater" asp-action="Index" class="btn btn-light">Xem Phòng</a>
+                        <a asp-controller="Theater" asp-action="Create" class="btn btn-outline-light">Thêm Phòng</a>
                     </div>
                 </div>
             </div>
         </div>
+     
 
         <!-- Quản lý Phòng chiếu -->
         <div class="col-md-4">
@@ -39,21 +40,19 @@
                 </div>
             </div>
         </div>
-
-        <!-- Quản lý Ghế ngồi -->
+        <!-- Quản lý Phim -->
         <div class="col-md-4">
-            <div class="card dashboard-card purple">
+            <div class="card dashboard-card green">
                 <div class="card-body text-center text-white">
-                    <div class="icon">💺</div>
-                    <h5 class="card-title">Quản lý Ghế ngồi</h5>
+                    <div class="icon">🎬</div>
+                    <h5 class="card-title">Quản lý Phim</h5>
                     <div class="btn-group-custom">
-                        <a asp-controller="Seat" asp-action="Index" class="btn btn-light">Xem Ghế</a>
-                        <a asp-controller="Seat" asp-action="Create" class="btn btn-outline-light">Thêm Ghế</a>
+                        <a asp-controller="Movie" asp-action="Index" class="btn btn-light">Xem Phim</a>
+                        <a asp-controller="Movie" asp-action="Create" class="btn btn-outline-light">Thêm Phim</a>
                     </div>
                 </div>
             </div>
         </div>
-
         <!-- Quản lý Lịch chiếu -->
         <div class="col-md-4">
             <div class="card dashboard-card orange">
@@ -67,21 +66,19 @@
                 </div>
             </div>
         </div>
-
-        <!-- Quản lý Vé -->
+        <!-- Quản lý Ghế ngồi -->
         <div class="col-md-4">
-            <div class="card dashboard-card red">
+            <div class="card dashboard-card purple">
                 <div class="card-body text-center text-white">
-                    <div class="icon">🎫</div>
-                    <h5 class="card-title">Quản lý Vé</h5>
+                    <div class="icon">💺</div>
+                    <h5 class="card-title">Quản lý Ghế ngồi</h5>
                     <div class="btn-group-custom">
-                        <a asp-controller="Ticket" asp-action="Index" class="btn btn-light">Xem Vé</a>
-                        <a asp-controller="Ticket" asp-action="Create" class="btn btn-outline-light">Thêm Vé</a>
+                        <a asp-controller="Seat" asp-action="Index" class="btn btn-light">Xem Ghế</a>
+                        <a asp-controller="Seat" asp-action="Create" class="btn btn-outline-light">Thêm Ghế</a>
                     </div>
                 </div>
             </div>
         </div>
-
         <!-- Quản lý Thể loại -->
         <div class="col-md-4">
             <div class="card dashboard-card sky">
@@ -109,19 +106,7 @@
                 </div>
             </div>
         </div>
-        <!-- Quản lý Phòng chiếu -->
-        <div class="col-md-4">
-            <div class="card dashboard-card blue">
-                <div class="card-body text-center text-white">
-                    <div class="icon">🏛️</div>
-                    <h5 class="card-title">Quản lý Rạp</h5>
-                    <div class="btn-group-custom">
-                        <a asp-controller="Theater" asp-action="Index" class="btn btn-light">Xem Phòng</a>
-                        <a asp-controller="Theater" asp-action="Create" class="btn btn-outline-light">Thêm Phòng</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+    
         <!-- Quản lý Đơn hàng -->
         <div class="col-md-4">
             <div class="card dashboard-card teal">
@@ -130,11 +115,23 @@
                     <h5 class="card-title">Quản lý Đơn hàng</h5>
                     <div class="btn-group-custom">
                         <a asp-controller="AdminOrders" asp-action="Index" class="btn btn-light">Xem Đơn hàng</a>
-                        <a asp-controller="AdminOrders" asp-action="Details" class="btn btn-outline-light">Chi tiết đơn hàng</a>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- Quản lý Doanh thu -->
+        <div class="col-md-4">
+            <div class="card dashboard-card red">
+                <div class="card-body text-center text-white">
+                    <div class="icon">🎫</div>
+                    <h5 class="card-title">Quản lý doanh thu</h5>
+                    <div class="btn-group-custom">
+                        <a asp-controller="Statistics" asp-action="Index" class="btn btn-light">Doanh thu</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
