@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<CINEMA.Models.Movie>
 @{
     ViewData["Title"] = "Trang chủ";
+    var comingSoon = ViewBag.ComingSoon as IEnumerable<CINEMA.Models.Movie> ?? Enumerable.Empty<CINEMA.Models.Movie>();
 }
 
 <!-- 🏠 Banner -->
@@ -91,6 +92,32 @@
                     <div class="card-body text-center">
                         <h5 class="fw-bold">@movie.Title</h5>
                         <p class="text-muted small">@movie.AgeRating | @movie.Duration phút</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- 🚀 PHIM SẮP CHIẾU -->
+<section class="container my-5">
+    <h2 class="fw-bold text-center mb-5 text-gradient">🚀 PHIM SẮP CHIẾU</h2>
+    <div class="row g-4">
+        @foreach (var movie in comingSoon)
+        {
+            <div class="col-md-3 col-sm-6">
+                <div class="movie-card shadow-sm border-0 h-100">
+                    <div class="position-relative">
+                        <img src="@movie.PosterUrl" class="card-img-top rounded-top-4" alt="@movie.Title">
+                        <div class="overlay d-flex align-items-center justify-content-center">
+                            <a href="#" class="btn btn-outline-secondary fw-bold rounded-pill px-4 py-2 shadow" disabled>
+                                ⏳ Sắp chiếu
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="fw-bold">@movie.Title</h5>
+                        <p class="text-muted small">Khởi chiếu: @movie.ReleaseDate?.ToString("dd/MM/yyyy")</p>
                     </div>
                 </div>
             </div>

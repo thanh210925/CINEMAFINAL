@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Đặt vé";
     var showtime = ViewBag.Showtime as CINEMA.Models.Showtime;
+    var showtimes = ViewBag.Showtimes as List<CINEMA.Models.Showtime> ?? new List<CINEMA.Models.Showtime>();
     var combos = ViewBag.Combos as List<CINEMA.Models.Combo>;
     var bookedSeats = ViewBag.BookedSeats as List<string> ?? new List<string>();
     var basePrice = showtime?.BasePrice ?? 0m;
@@ -53,7 +54,31 @@
                         <p class="text-muted fst-italic mt-2">🎬 Chưa có trailer cho phim này.</p>
                     }
 
-                    <!-- 📅 Suất chiếu -->
+                    <!-- 🕒 Danh sách suất chiếu -->
+                    @if (showtimes.Any())
+                    {
+                        <div class="bg-white border rounded p-3 mt-3">
+                            <h6 class="fw-bold text-primary mb-2">
+                                <i class="bi bi-calendar-event me-2"></i>Chọn suất chiếu
+                            </h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var s in showtimes)
+                                {
+                                    bool isActive = showtime != null && s.ShowtimeId == showtime.ShowtimeId;
+                                    <a asp-controller="Home"
+                                       asp-action="BookTicket"
+                                       asp-route-id="@Model.MovieId"
+                                       asp-route-showtimeId="@s.ShowtimeId"
+                                       class="showtime-btn @(isActive ? "active" : "")">
+                                        <span>@s.StartTime?.ToString("dd/MM")</span>
+                                        <strong>@s.StartTime?.ToString("HH:mm")</strong>
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <!-- 📅 Suất chiếu đang chọn -->
                     @if (showtime != null)
                     {
                         <div class="bg-light rounded p-3 mt-3">
@@ -218,22 +243,37 @@
     </form>
 </div>
 
-<!-- 🎥 Modal Trailer -->
-<div class="modal fade" id="trailerModal" tabindex="-1" aria-labelledby="trailerLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4">
-            <div class="modal-header bg-dark text-white">
-                <h5 class="modal-title" id="trailerLabel">🎬 Trailer phim</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-0">
-                <div class="ratio ratio-16x9">
-                    <iframe id="trailerFrame" src="" allowfullscreen class="border-0"></iframe>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- 🧭 CSS cho suất chiếu -->
+<style>
+.showtime-btn {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 90px;
+    padding: 10px 8px;
+    border-radius: 12px;
+    border: 2px solid #0d6efd;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    color: #0d6efd;
+    background: white;
+}
+.showtime-btn strong {
+    font-size: 1rem;
+}
+.showtime-btn:hover {
+    background: linear-gradient(135deg, #0d6efd, #5aa1ff);
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13,110,253,0.35);
+}
+.showtime-btn.active {
+    background: linear-gradient(135deg, #0d6efd, #5aa1ff);
+    color: white;
+    box-shadow: 0 0 10px rgba(13,110,253,0.6);
+}
+</style>
 
 @section Scripts {
 <script>
@@ -288,37 +328,6 @@ setInterval(() => {
     let s = timeLeft % 60;
     document.getElementById("countdown").innerText = `${m}:${s.toString().padStart(2, '0')}`;
 }, 1000);
-
-document.addEventListener('DOMContentLoaded', function () {
-    const modal = document.getElementById('trailerModal');
-    const frame = document.getElementById('trailerFrame');
-    const title = document.getElementById('trailerLabel');
-
-    modal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const trailerUrl = button.getAttribute('data-trailer');
-        const movieTitle = button.getAttribute('data-title');
-        let embedUrl = "";
-
-        if (trailerUrl.includes("youtube.com") || trailerUrl.includes("youtu.be")) {
-            let videoId = "";
-            if (trailerUrl.includes("v=")) videoId = trailerUrl.split("v=")[1].split("&")[0];
-            else if (trailerUrl.includes("youtu.be/")) videoId = trailerUrl.split("youtu.be/")[1].split("?")[0];
-            embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-        } else if (trailerUrl.endsWith(".mp4")) {
-            embedUrl = trailerUrl;
-        } else {
-            embedUrl = trailerUrl;
-        }
-
-        frame.src = embedUrl;
-        title.textContent = `🎬 Trailer – ${movieTitle}`;
-    });
-
-    modal.addEventListener('hidden.bs.modal', function () {
-        frame.src = "";
-    });
-});
 
 calcTotal();
 </script>
