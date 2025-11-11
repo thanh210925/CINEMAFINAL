@@ -34,20 +34,28 @@
     <div class="card shadow-sm border-0">
         <div class="card-body">
             <h5 class="fw-bold mb-3">🎟 ĐẶT VÉ NHANH</h5>
+
             <form asp-controller="Home" asp-action="BookTicket" method="post" class="row g-3 align-items-center">
 
-                <!-- Chọn phim -->
-                <div class="col-md-4">
-                    <select class="form-select" id="movieSelect" name="movieId" required>
-                        <option selected disabled>-- Chọn phim --</option>
-                        @foreach (var movie in Model)
+                <!-- Chọn rạp -->
+                <div class="col-md-3">
+                    <select class="form-select" id="theaterSelect" name="theaterId" required>
+                        <option selected disabled>-- Chọn rạp --</option>
+                        @foreach (var theater in ViewBag.Theaters)
                         {
-                            <option value="@movie.MovieId">@movie.Title</option>
+                            <option value="@theater.TheaterId">@theater.Name</option>
                         }
                     </select>
                 </div>
 
-                <!-- Chọn ngày chiếu -->
+                <!-- Chọn phim -->
+                <div class="col-md-3">
+                    <select class="form-select" id="movieSelect" name="movieId" required>
+                        <option selected disabled>-- Chọn phim --</option>
+                    </select>
+                </div>
+
+                <!-- Chọn ngày -->
                 <div class="col-md-3">
                     <select class="form-select" id="dateSelect" name="date" required>
                         <option selected disabled>-- Chọn ngày --</option>
@@ -55,16 +63,16 @@
                 </div>
 
                 <!-- Chọn suất chiếu -->
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <select class="form-select" id="showtimeSelect" name="showtimeId" required>
                         <option selected disabled>-- Chọn suất chiếu --</option>
                     </select>
                 </div>
 
-                <!-- Nút đặt vé -->
-                <div class="col-md-2">
+                <!-- Nút đặt -->
+                <div class="col-md-1">
                     <button type="submit" class="btn btn-danger w-100 fw-bold">
-                        ĐẶT NGAY
+                        ĐẶT
                     </button>
                 </div>
             </form>
@@ -130,26 +138,56 @@
 
 @section Scripts {
     <script>
+        const theaterSelect = document.getElementById("theaterSelect");
         const movieSelect = document.getElementById("movieSelect");
         const dateSelect = document.getElementById("dateSelect");
         const showtimeSelect = document.getElementById("showtimeSelect");
 
-        movieSelect.addEventListener("change", function () {
-            const movieId = this.value;
-
-            // Reset dropdown
+        // Khi chọn RẠP => load danh sách phim theo rạp
+        theaterSelect.addEventListener("change", function () {
+            const theaterId = this.value;
+            movieSelect.innerHTML = '<option selected disabled>-- Chọn phim --</option>';
             dateSelect.innerHTML = '<option selected disabled>-- Chọn ngày --</option>';
             showtimeSelect.innerHTML = '<option selected disabled>-- Chọn suất chiếu --</option>';
 
-            fetch(`/Home/GetShowtimesByMovie?movieId=${movieId}`)
+            if (!theaterId) return;
+
+            fetch(`/Home/GetMoviesByTheater?theaterId=${theaterId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        alert("🎬 Rạp này hiện chưa có phim nào chiếu!");
+                        return;
+                    }
+                    data.forEach(m => {
+                        const opt = document.createElement("option");
+                        opt.value = m.movieId;
+                        opt.textContent = m.title;
+                        movieSelect.appendChild(opt);
+                    });
+                })
+                .catch(err => console.error("❌ Lỗi API phim:", err));
+        });
+
+        // Khi chọn PHIM => load danh sách ngày + suất chiếu
+        movieSelect.addEventListener("change", function () {
+            const theaterId = theaterSelect.value;
+            const movieId = this.value;
+
+            dateSelect.innerHTML = '<option selected disabled>-- Chọn ngày --</option>';
+            showtimeSelect.innerHTML = '<option selected disabled>-- Chọn suất chiếu --</option>';
+
+            if (!theaterId || !movieId) return;
+
+            fetch(`/Home/GetShowtimes?theaterId=${theaterId}&movieId=${movieId}`)
                 .then(res => res.json())
                 .then(data => {
                     if (!data || data.length === 0) {
-                        alert("Phim này chưa có lịch chiếu!");
+                        alert("⏰ Phim này chưa có lịch chiếu tại rạp đã chọn!");
                         return;
                     }
 
-                    // Lấy danh sách ngày duy nhất
+                    // Hiển thị danh sách ngày chiếu
                     const dates = [...new Set(data.map(s => s.date))];
                     dates.forEach(d => {
                         const opt = document.createElement("option");
@@ -159,22 +197,19 @@
                         dateSelect.appendChild(opt);
                     });
 
-                    // Khi chọn ngày => hiển thị suất chiếu
+                    // Khi chọn ngày => hiển thị suất chiếu tương ứng
                     dateSelect.onchange = function () {
                         const selectedDate = this.value;
                         showtimeSelect.innerHTML = '<option selected disabled>-- Chọn suất chiếu --</option>';
-
                         data.filter(s => s.date === selectedDate).forEach(s => {
                             const opt = document.createElement("option");
                             opt.value = s.showtimeId;
-                            opt.textContent = `${s.time} - Giá: ${Number(s.price).toLocaleString("vi-VN")}đ`;
+                            opt.textContent = `${s.time} - ${Number(s.price).toLocaleString("vi-VN")}đ`;
                             showtimeSelect.appendChild(opt);
                         });
                     };
                 })
-                .catch(err => console.error("❌ API error:", err));
+                .catch(err => console.error("❌ Lỗi API suất chiếu:", err));
         });
     </script>
-
-    <script src="~/js/home.js"></script>
 }

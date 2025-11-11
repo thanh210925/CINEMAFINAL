@@ -17,11 +17,13 @@ namespace CINEMA.Controllers
         public IActionResult Index()
         {
             var auditoriums = _context.Auditoriums
+                .Include(a => a.Theater)  // 🔹 Load thông tin rạp liên kết
                 .OrderBy(a => a.AuditoriumId)
                 .ToList();
 
             return View(auditoriums);
         }
+
 
         // ➕ Trang thêm mới
         public IActionResult Create()

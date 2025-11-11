@@ -42,9 +42,9 @@ public partial class CinemaContext : DbContext
     public virtual DbSet<TicketCombo> TicketCombos { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-11TEUJ3\\BANGTHANH;Database=CINEMA;User Id=BANGTHANH;Password=Bt@0923113;TrustServerCertificate=True;");
 
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Admin>(entity =>
@@ -110,6 +110,9 @@ public partial class CinemaContext : DbContext
 
             entity.HasIndex(e => e.Email, "UQ__Customer__A9D10534C763062F").IsUnique();
 
+            entity.Property(e => e.Address).HasMaxLength(255);
+            entity.Property(e => e.AvatarUrl).HasMaxLength(500);
+            entity.Property(e => e.City).HasMaxLength(100);
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -119,6 +122,7 @@ public partial class CinemaContext : DbContext
             entity.Property(e => e.LastLogin).HasColumnType("datetime");
             entity.Property(e => e.PasswordHash).HasMaxLength(200);
             entity.Property(e => e.Phone).HasMaxLength(20);
+            entity.Property(e => e.Region).HasMaxLength(100);
         });
 
         modelBuilder.Entity<Genre>(entity =>
@@ -166,12 +170,14 @@ public partial class CinemaContext : DbContext
         {
             entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF0301CE9E");
 
+            entity.Property(e => e.ComboTotal).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.PaidAt).HasColumnType("datetime");
             entity.Property(e => e.PaymentMethod).HasMaxLength(30);
             entity.Property(e => e.Status).HasMaxLength(20);
+            entity.Property(e => e.TicketTotal).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(12, 2)");
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Orders)
@@ -253,6 +259,11 @@ public partial class CinemaContext : DbContext
             entity.HasOne(d => d.Customer).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.CustomerId)
                 .HasConstraintName("FK__Tickets__Custome__47DBAE45");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.Tickets)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_Tickets_Orders");
 
             entity.HasOne(d => d.Seat).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.SeatId)

@@ -98,7 +98,6 @@ namespace CINEMA.Controllers
             });
         }
 
-        // =================== [4] XÓA ĐƠN HÀNG ===================
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
