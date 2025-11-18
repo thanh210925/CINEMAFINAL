@@ -19,17 +19,12 @@ namespace CINEMA.Controllers
         // ================== TRANG CHỦ ==================
         public IActionResult Index()
         {
+            var movies = _context.Movies.ToList();
+
+            // ✅ Lấy ngày hôm nay dưới dạng DateOnly để so với ReleaseDate (DateOnly?)
             var today = DateOnly.FromDateTime(DateTime.Today);
 
-            // 🔹 Phim đang chiếu
-            var movies = _context.Movies
-                .Where(m => m.IsActive == true
-                            && m.ReleaseDate.HasValue
-                            && m.ReleaseDate.Value <= today)
-                .OrderByDescending(m => m.ReleaseDate)
-                .ToList();
-
-            // 🔹 Phim sắp chiếu
+            // ✅ Phim sắp chiếu: còn active, có ReleaseDate, và ReleaseDate > hôm nay
             var comingSoon = _context.Movies
                 .Where(m => m.IsActive == true
                             && m.ReleaseDate.HasValue
@@ -48,7 +43,8 @@ namespace CINEMA.Controllers
             return View(movies);
         }
 
-        // ================== ĐẶT VÉ ==================
+
+        // ------------------ ĐẶT VÉ (GET) ------------------
         [HttpGet]
         public IActionResult BookTicket(int id, int? showtimeId)
         {
