@@ -19,15 +19,17 @@ namespace CINEMA.Controllers
         // ================== TRANG CHỦ ==================
         public IActionResult Index()
         {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
             // 🔹 Phim đang chiếu
             var movies = _context.Movies
-                .Where(m => m.IsActive == true)
+                .Where(m => m.IsActive == true
+                            && m.ReleaseDate.HasValue
+                            && m.ReleaseDate.Value <= today)
                 .OrderByDescending(m => m.ReleaseDate)
                 .ToList();
 
             // 🔹 Phim sắp chiếu
-            var today = DateOnly.FromDateTime(DateTime.Today);
-
             var comingSoon = _context.Movies
                 .Where(m => m.IsActive == true
                             && m.ReleaseDate.HasValue
@@ -35,7 +37,7 @@ namespace CINEMA.Controllers
                 .OrderBy(m => m.ReleaseDate)
                 .ToList();
 
-            // 🔹 Danh sách rạp cho dropdown "Đặt vé nhanh"
+            // 🔹 Danh sách rạp
             var theaters = _context.Theaters
                 .OrderBy(t => t.Name)
                 .ToList();
@@ -46,7 +48,7 @@ namespace CINEMA.Controllers
             return View(movies);
         }
 
-        // ================== ĐẶT VÉ (GET) ==================
+        // ================== ĐẶT VÉ ==================
         [HttpGet]
         public IActionResult BookTicket(int id, int? showtimeId)
         {
@@ -57,13 +59,13 @@ namespace CINEMA.Controllers
             if (movie == null)
                 return NotFound("Không tìm thấy phim này.");
 
-            // 🔹 Nếu chưa chọn suất chiếu cụ thể → lấy suất chiếu sớm nhất
+            // Nếu chưa chọn suất chiếu → lấy suất gần nhất
             if (!showtimeId.HasValue)
             {
                 showtimeId = _context.Showtimes
                     .Where(s => s.MovieId == id
                                 && s.IsActive == true
-                                && s.StartTime.HasValue
+                                && s.StartTime != null
                                 && s.StartTime.Value >= DateTime.Now)
                     .OrderBy(s => s.StartTime)
                     .Select(s => s.ShowtimeId)
@@ -82,7 +84,7 @@ namespace CINEMA.Controllers
                                          && s.IsActive == true);
             }
 
-            // 🔹 Lấy danh sách ghế
+            // Ghế trong phòng chiếu
             var seats = new List<Seat>();
             if (showtime?.AuditoriumId != null)
             {
@@ -94,7 +96,7 @@ namespace CINEMA.Controllers
                     .ToList();
             }
 
-            // 🔹 Ghế đã đặt
+            // Ghế đã đặt
             var bookedSeats = new List<string>();
             if (showtime != null)
             {
@@ -105,7 +107,7 @@ namespace CINEMA.Controllers
                     .ToList();
             }
 
-            // 🔹 Danh sách suất chiếu của phim này
+            // Suất chiếu của phim
             var showtimes = _context.Showtimes
                 .Include(s => s.Auditorium)
                     .ThenInclude(a => a.Theater)
@@ -116,6 +118,7 @@ namespace CINEMA.Controllers
                 .OrderBy(s => s.StartTime)
                 .ToList();
 
+            // Combo
             var combos = _context.Combos
                 .Where(c => c.IsActive == true)
                 .ToList();
@@ -129,7 +132,7 @@ namespace CINEMA.Controllers
             return View(movie);
         }
 
-        // ================== ĐẶT VÉ (POST từ ĐẶT VÉ NHANH) ==================
+        // ================== ĐẶT VÉ NHANH (POST) ==================
         [HttpPost]
         public IActionResult BookTicket(int movieId, int showtimeId)
         {
@@ -140,15 +143,12 @@ namespace CINEMA.Controllers
             var showtime = _context.Showtimes
                 .Include(s => s.Auditorium)
                     .ThenInclude(a => a.Theater)
-                .FirstOrDefault(s => s.ShowtimeId == showtimeId
-                                     && s.IsActive == true);
+                .FirstOrDefault(s => s.ShowtimeId == showtimeId && s.IsActive == true);
 
             if (movie == null || showtime == null)
                 return NotFound("Phim hoặc suất chiếu không tồn tại.");
 
-            var combos = _context.Combos
-                .Where(c => c.IsActive == true)
-                .ToList();
+            var combos = _context.Combos.Where(c => c.IsActive == true).ToList();
 
             var seats = _context.Seats
                 .Where(s => s.AuditoriumId == showtime.AuditoriumId
@@ -195,7 +195,7 @@ namespace CINEMA.Controllers
             return Json(movies);
         }
 
-        // ================== API: LẤY SUẤT CHIẾU THEO RẠP + PHIM ==================
+        // ================== API: LẤY SUẤT CHIẾU THEO PHIM + RẠP ==================
         [HttpGet]
         public IActionResult GetShowtimes(int theaterId, int movieId)
         {
@@ -265,18 +265,6 @@ namespace CINEMA.Controllers
             return View(movies);
         }
 
-        // ================== PRIVACY & ERROR ==================
-        public IActionResult Privacy() => View();
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel
-            {
-                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
-            });
-        }
-
         // ================== THANH TOÁN ==================
         [HttpPost]
         public IActionResult GoToPayment(int movieId, int showtimeId, string selectedSeats, int comboId)
@@ -307,6 +295,18 @@ namespace CINEMA.Controllers
             ViewBag.Total = total;
 
             return View("Payment");
+        }
+
+        // ================== PRIVACY & ERROR ==================
+        public IActionResult Privacy() => View();
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
         }
     }
 }
