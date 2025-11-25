@@ -5,6 +5,7 @@
 }
 
 <div class="container-fluid py-4">
+
     <!-- Header -->
     <div class="d-flex align-items-center mb-4">
         <h2 class="fw-bold mb-0 text-primary">
@@ -16,7 +17,8 @@
         <input type="hidden" asp-for="MovieId" />
 
         <div class="row">
-            <!-- Left Column: Thông tin -->
+
+            <!-- Left Column -->
             <div class="col-lg-8">
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-header bg-white border-bottom py-3">
@@ -24,7 +26,9 @@
                             <i class="bi bi-info-circle text-primary me-2"></i> Thông tin cơ bản
                         </h5>
                     </div>
+
                     <div class="card-body p-4">
+
                         <div class="mb-4">
                             <label class="form-label fw-semibold">Tên phim</label>
                             <input asp-for="Title" class="form-control form-control-lg" placeholder="Nhập tên phim..." />
@@ -35,10 +39,11 @@
                                 <label class="form-label fw-semibold">Thời lượng (phút)</label>
                                 <input asp-for="Duration" type="number" class="form-control" placeholder="120" />
                             </div>
+
                             <div class="col-md-6 mb-4">
                                 <label class="form-label fw-semibold">Ngày khởi chiếu</label>
                                 <input asp-for="ReleaseDate" type="date" class="form-control"
-                                       value="@(Model.ReleaseDate.HasValue? Model.ReleaseDate.Value.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) : "")" />
+                                       value="@(Model.ReleaseDate.HasValue? Model.ReleaseDate.Value.ToString("yyyy-MM-dd") : "")" />
                             </div>
                         </div>
 
@@ -59,22 +64,26 @@
 
                         <div class="mb-4">
                             <label class="form-label fw-semibold">Mô tả</label>
-                            <textarea asp-for="Description" class="form-control" rows="5" placeholder="Nhập mô tả nội dung phim..."></textarea>
+                            <textarea asp-for="Description" class="form-control" rows="5"
+                                      placeholder="Nhập mô tả nội dung phim..."></textarea>
                         </div>
 
+                        <!-- FIXED DROPDOWN TRẠNG THÁI -->
                         <div>
                             <label class="form-label fw-semibold">Trạng thái</label>
                             <select asp-for="IsActive" class="form-select">
-                                <option value="true" selected="@(Model.IsActive == true)">Đang chiếu</option>
-                                <option value="false" selected="@(Model.IsActive == false)">Ngưng chiếu</option>
+                                <option value="true">Đang chiếu</option>
+                                <option value="false">Ngưng chiếu</option>
                             </select>
                         </div>
+
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Poster & Trailer -->
+            <!-- Right Column -->
             <div class="col-lg-4">
+
                 <!-- Poster -->
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-header bg-white border-bottom py-3">
@@ -82,7 +91,9 @@
                             <i class="bi bi-image text-success me-2"></i> Poster phim
                         </h5>
                     </div>
+
                     <div class="card-body p-4">
+
                         <div class="mb-3">
                             <label class="form-label fw-semibold">URL Poster</label>
                             <input asp-for="PosterUrl" class="form-control" placeholder="https://..." />
@@ -102,12 +113,11 @@
                         else
                         {
                             <div class="text-center py-5 bg-light rounded border border-dashed">
-                                <div class="text-muted">
-                                    <i class="bi bi-image fs-1 mb-2"></i>
-                                    <p class="mb-0">Chưa có poster</p>
-                                </div>
+                                <i class="bi bi-image fs-1 mb-2 text-muted"></i>
+                                <p class="text-muted mb-0">Chưa có poster</p>
                             </div>
                         }
+
                     </div>
                 </div>
 
@@ -118,10 +128,13 @@
                             <i class="bi bi-camera-reels text-danger me-2"></i> Trailer phim
                         </h5>
                     </div>
+
                     <div class="card-body p-4">
+
                         <div class="mb-3">
                             <label class="form-label fw-semibold">URL Trailer</label>
-                            <input asp-for="TrailerUrl" class="form-control" placeholder="https://www.youtube.com/watch?v=..." />
+                            <input asp-for="TrailerUrl" class="form-control"
+                                   placeholder="https://www.youtube.com/watch?v=..." />
                             <small class="text-muted fst-italic">Hỗ trợ YouTube hoặc link .mp4</small>
                         </div>
 
@@ -129,20 +142,18 @@
                         {
                             <div class="mt-3">
                                 <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm border">
+
                                     @{
-                                        string embedUrl = "";
+                                        string embedUrl;
                                         if (Model.TrailerUrl.Contains("youtube.com") || Model.TrailerUrl.Contains("youtu.be"))
                                         {
-                                            string videoId = "";
+                                            string vid = "";
                                             if (Model.TrailerUrl.Contains("v="))
-                                            {
-                                                videoId = Model.TrailerUrl.Split("v=")[1].Split("&")[0];
-                                            }
+                                                vid = Model.TrailerUrl.Split("v=")[1].Split("&")[0];
                                             else if (Model.TrailerUrl.Contains("youtu.be/"))
-                                            {
-                                                videoId = Model.TrailerUrl.Split("youtu.be/")[1].Split("?")[0];
-                                            }
-                                            embedUrl = $"https://www.youtube.com/embed/{videoId}";
+                                                vid = Model.TrailerUrl.Split("youtu.be/")[1].Split("?")[0];
+
+                                            embedUrl = $"https://www.youtube.com/embed/{vid}";
                                         }
                                         else
                                         {
@@ -151,19 +162,20 @@
                                     }
 
                                     <iframe src="@embedUrl" allowfullscreen class="border-0"></iframe>
+
                                 </div>
+
                                 <small class="text-muted d-block mt-2 text-center">Preview trailer hiện tại</small>
                             </div>
                         }
                         else
                         {
                             <div class="text-center py-5 bg-light rounded border border-dashed">
-                                <div class="text-muted">
-                                    <i class="bi bi-camera-video fs-1 mb-2"></i>
-                                    <p class="mb-0">Chưa có trailer</p>
-                                </div>
+                                <i class="bi bi-camera-video fs-1 mb-2 text-muted"></i>
+                                <p class="text-muted mb-0">Chưa có trailer</p>
                             </div>
                         }
+
                     </div>
                 </div>
             </div>
@@ -175,10 +187,12 @@
                 <button type="submit" class="btn btn-primary btn-lg px-4 me-2 shadow">
                     <i class="bi bi-save me-2"></i>Lưu thay đổi
                 </button>
+
                 <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
                     <i class="bi bi-arrow-left-circle me-2"></i>Hủy
                 </a>
             </div>
         </div>
+
     </form>
 </div>

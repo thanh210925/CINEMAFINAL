@@ -13,7 +13,9 @@ namespace CINEMA.Controllers
             _context = context;
         }
 
-        // GET: Showtime
+        // ========================
+        // 🔥 DANH SÁCH LỊCH CHIẾU
+        // ========================
         public IActionResult Index()
         {
             var showtimes = _context.Showtimes
@@ -22,33 +24,40 @@ namespace CINEMA.Controllers
                 .OrderByDescending(s => s.StartTime)
                 .ToList();
 
+            ViewBag.ActiveShowtimes = showtimes.Where(s => s.IsActive == true).ToList();
+            ViewBag.EndedShowtimes = showtimes.Where(s => s.IsActive == false).ToList();
 
-            return View(showtimes);
+            return View();
         }
 
-        // GET: Showtime/Create
+        // ========================
+        // 🔥 TẠO LỊCH CHIẾU
+        // ========================
         public IActionResult Create()
         {
-            ViewBag.Movies = _context.Movies.ToList();
+            ViewBag.Movies = _context.Movies.Where(m => m.IsActive == true).ToList();
             ViewBag.Auditoriums = _context.Auditoriums.ToList();
             return View();
         }
 
-        // POST: Showtime/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Showtime showtime)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Showtimes.Add(showtime);
-                _context.SaveChanges();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(showtime);
+            if (!ModelState.IsValid)
+                return View(showtime);
+
+            showtime.IsActive = true;
+
+            _context.Showtimes.Add(showtime);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Showtime/Edit/5
+        // ========================
+        // 🔥 SỬA
+        // ========================
         public IActionResult Edit(int id)
         {
             var showtime = _context.Showtimes.Find(id);
@@ -56,45 +65,88 @@ namespace CINEMA.Controllers
 
             ViewBag.Movies = _context.Movies.ToList();
             ViewBag.Auditoriums = _context.Auditoriums.ToList();
+
             return View(showtime);
         }
 
-        // POST: Showtime/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Showtime showtime)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Update(showtime);
-                _context.SaveChanges();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(showtime);
+            if (!ModelState.IsValid)
+                return View(showtime);
+
+            _context.Showtimes.Update(showtime);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Showtime/Delete/5
+        // ========================
+        // 🔥 XÓA LỊCH CHIẾU
+        // ========================
         public IActionResult Delete(int id)
         {
             var showtime = _context.Showtimes
                 .Include(s => s.Movie)
+                .Include(s => s.Auditorium)
                 .FirstOrDefault(s => s.ShowtimeId == id);
 
             if (showtime == null) return NotFound();
             return View(showtime);
         }
 
-        // POST: Showtime/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
+            // 1. Lấy tất cả tickets của suất chiếu
+            var tickets = _context.Tickets
+                .Where(t => t.ShowtimeId == id)
+                .Include(t => t.TicketCombos)
+                .ToList();
+
+            // 2. Xóa ticket combos trước
+            foreach (var t in tickets)
+            {
+                if (t.TicketCombos != null && t.TicketCombos.Any())
+                {
+                    _context.TicketCombos.RemoveRange(t.TicketCombos);
+                }
+            }
+            _context.SaveChanges();
+
+            // 3. Xoá tickets
+            if (tickets.Any())
+            {
+                _context.Tickets.RemoveRange(tickets);
+                _context.SaveChanges();
+            }
+
+            // 4. Xóa suất chiếu
             var showtime = _context.Showtimes.Find(id);
             if (showtime != null)
             {
                 _context.Showtimes.Remove(showtime);
                 _context.SaveChanges();
             }
+
+            TempData["SuccessMessage"] = "🗑 Đã xóa suất chiếu thành công!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // ========================
+        // 🔥 BẬT LẠI SUẤT CHIẾU
+        // ========================
+        [HttpPost]
+        public IActionResult Activate(int id)
+        {
+            var showtime = _context.Showtimes.Find(id);
+            if (showtime == null) return NotFound();
+
+            showtime.IsActive = true;
+            _context.SaveChanges();
+
             return RedirectToAction(nameof(Index));
         }
     }

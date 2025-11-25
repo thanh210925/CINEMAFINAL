@@ -19,6 +19,7 @@ namespace CINEMA.Controllers
             var genres = _context.Genres
                 .Include(g => g.Movies)
                 .ToList();
+
             return View(genres);
         }
 
@@ -34,7 +35,6 @@ namespace CINEMA.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Gắn phim được chọn vào thể loại
                 foreach (var movieId in selectedMovies)
                 {
                     var movie = _context.Movies.Find(movieId);
@@ -46,11 +46,12 @@ namespace CINEMA.Controllers
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
+
             ViewBag.Movies = _context.Movies.ToList();
             return View(genre);
         }
 
-        // 🟢 Sửa thể loại
+        // 🟢 Sửa
         public IActionResult Edit(int id)
         {
             var genre = _context.Genres
@@ -77,8 +78,8 @@ namespace CINEMA.Controllers
             existing.Name = genre.Name;
             existing.Description = genre.Description;
 
-            // Xóa phim cũ và thêm phim mới
             existing.Movies.Clear();
+
             foreach (var movieId in selectedMovies)
             {
                 var movie = _context.Movies.Find(movieId);
@@ -90,23 +91,37 @@ namespace CINEMA.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // 🟢 Xóa
+        // 🟢 Xóa (GET)
         public IActionResult Delete(int id)
         {
-            var genre = _context.Genres.Find(id);
+            var genre = _context.Genres
+                .Include(g => g.Movies)
+                .FirstOrDefault(g => g.GenreId == id);
+
             if (genre == null) return NotFound();
+
             return View(genre);
         }
 
+        // 🟢 Xóa (POST)
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
-            var genre = _context.Genres.Find(id);
+            var genre = _context.Genres
+                .Include(g => g.Movies)
+                .FirstOrDefault(g => g.GenreId == id);
+
             if (genre != null)
             {
+                // 🔥 Xóa quan hệ Many-to-Many trước
+                genre.Movies.Clear();
+                _context.SaveChanges();
+
+                // 🔥 Sau đó mới xoá thể loại
                 _context.Genres.Remove(genre);
                 _context.SaveChanges();
             }
+
             return RedirectToAction(nameof(Index));
         }
     }

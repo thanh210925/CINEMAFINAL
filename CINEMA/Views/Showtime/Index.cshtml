@@ -1,45 +1,125 @@
-﻿@model IEnumerable<CINEMA.Models.Showtime>
-@{
+﻿@{
     ViewData["Title"] = "Quản lý lịch chiếu";
     Layout = "_AdminLayout";
+
+    var active = ViewBag.ActiveShowtimes as List<CINEMA.Models.Showtime>;
+    var ended = ViewBag.EndedShowtimes as List<CINEMA.Models.Showtime>;
 }
 
 <div class="container mt-4">
-    <h2 class="fw-bold">📅 Quản lý lịch chiếu</h2>
-    <a asp-action="Create" class="btn btn-primary mb-3">➕ Thêm lịch chiếu</a>
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Phim</th>
-                <th>Rạp</th>
-                <th>Bắt đầu</th>
-                <th>Kết thúc</th>
-                <th>Giá vé</th>
-                <th>Ngôn ngữ</th>
-                <th>Trạng thái</th>
-                <th>Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var s in Model)
-            {
-                <tr>
-                    <td>@s.Movie?.Title</td>
-                    <td>@s.Auditorium?.Name</td>
-                    <td>@s.StartTime?.ToString("dd/MM/yyyy HH:mm")</td>
-                    <td>@s.EndTime?.ToString("dd/MM/yyyy HH:mm")</td>
-                    <td>@s.BasePrice?.ToString("N0") đ</td>
-                    <td>@s.Language</td>
-                    <td>
-                        @(s.IsActive == true ? "Đang chiếu" : "Ngưng")
-                    </td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@s.ShowtimeId" class="btn btn-sm btn-warning">✏️ Sửa</a>
-                        <a asp-action="Delete" asp-route-id="@s.ShowtimeId" class="btn btn-sm btn-danger">🗑 Xóa</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <h2 class="fw-bold mb-3">📅 Quản lý lịch chiếu</h2>
+    <a asp-action="Create" class="btn btn-primary mb-4">➕ Thêm lịch chiếu</a>
+
+    <!-- =============== ĐANG CHIẾU =============== -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-success text-white fw-semibold">
+            🎬 Suất chiếu đang hoạt động
+        </div>
+
+        <div class="card-body p-0">
+            <table class="table table-striped align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Phim</th>
+                        <th>Rạp</th>
+                        <th>Bắt đầu</th>
+                        <th>Kết thúc</th>
+                        <th>Giá vé</th>
+                        <th>Ngôn ngữ</th>
+                        <th class="text-center">Hành động</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (active != null && active.Any())
+                    {
+                        foreach (var s in active)
+                        {
+                            <tr>
+                                <td>@s.Movie?.Title</td>
+                                <td>@s.Auditorium?.Name</td>
+                                <td>@s.StartTime?.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@s.EndTime?.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@s.BasePrice?.ToString("N0") đ</td>
+                                <td>@s.Language</td>
+
+                                <td class="text-center">
+                                    <a asp-action="Edit" asp-route-id="@s.ShowtimeId"
+                                       class="btn btn-sm btn-warning">✏️ Sửa</a>
+                                    <a asp-action="Delete" asp-route-id="@s.ShowtimeId"
+                                       class="btn btn-sm btn-danger">🗑 Xóa</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="7" class="text-center text-muted py-3">Không có suất chiếu nào.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- =============== NGƯNG CHIẾU =============== -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-secondary text-white fw-semibold">
+            ❌ Suất chiếu đã ngưng hoạt động
+        </div>
+
+        <div class="card-body p-0">
+            <table class="table table-striped align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Phim</th>
+                        <th>Rạp</th>
+                        <th>Bắt đầu</th>
+                        <th>Kết thúc</th>
+                        <th>Giá vé</th>
+                        <th>Ngôn ngữ</th>
+                        <th class="text-center">Hành động</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (ended != null && ended.Any())
+                    {
+                        foreach (var s in ended)
+                        {
+                            <tr>
+                                <td>@s.Movie?.Title</td>
+                                <td>@s.Auditorium?.Name</td>
+                                <td>@s.StartTime?.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@s.EndTime?.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@s.BasePrice?.ToString("N0") đ</td>
+                                <td>@s.Language</td>
+
+                                <td class="text-center d-flex justify-content-center gap-2">
+
+                                    <form asp-action="Activate" asp-route-id="@s.ShowtimeId" method="post">
+                                        <button class="btn btn-sm btn-success">🔄 Bật lại</button>
+                                    </form>
+
+                                    <a asp-action="Delete" asp-route-id="@s.ShowtimeId"
+                                       class="btn btn-sm btn-danger">
+                                        🗑 Xóa
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="7" class="text-center text-muted py-3">Không có suất chiếu ngưng.</td></tr>
+                    }
+                </tbody>
+
+
+            </table>
+        </div>
+    </div>
+
 </div>

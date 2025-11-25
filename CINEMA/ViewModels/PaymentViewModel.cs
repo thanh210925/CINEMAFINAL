@@ -7,7 +7,7 @@ namespace CINEMA.ViewModels
     public class ComboViewModel
     {
         public int OrderComboId { get; set; }
-        public int ComboId { get; set; }     // Id combo trong DB
+        public int ComboId { get; set; }
         public string ComboName { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
@@ -15,34 +15,40 @@ namespace CINEMA.ViewModels
 
     public class PaymentViewModel
     {
-        // 👇 THÊM 3 DÒNG NÀY ĐỂ GIỮ THÔNG TIN KHÁCH HÀNG 👇
+        // 👉 Thông tin khách hàng
         public string CustomerName { get; set; }
         public string CustomerEmail { get; set; }
         public string CustomerPhone { get; set; }
-        // --------------------------------------------------
 
-        // --- Các thuộc tính cũ của bạn ---
-        public int TicketId { get; set; }
-        public Ticket Ticket { get; set; } // Thuộc tính này có vẻ không cần thiết trong ViewModel này
-
+        // 👉 Thông tin phim & suất chiếu
         public int MovieId { get; set; }
         public int ShowtimeId { get; set; }
         public string MovieTitle { get; set; }
         public string Showtime { get; set; }
         public string Auditorium { get; set; }
+
+        // ⭐👉 THÔNG TIN RẠP CHIẾU — THÊM ĐÚNG NƠI NÀY
+        public string TheaterName { get; set; }
+        public string TheaterAddress { get; set; }
+        public string TheaterPhone { get; set; }
+
+        // 👉 Ghế đã chọn
         public List<string> SelectedSeats { get; set; } = new List<string>();
 
+        // 👉 Combo
         public List<ComboViewModel> Combos { get; set; } = new List<ComboViewModel>();
 
+        // 👉 Loại vé
         public int AdultTickets { get; set; }
         public int ChildTickets { get; set; }
         public int StudentTickets { get; set; }
 
+        // 👉 Tổng tiền
         public decimal TotalPrice { get; set; }
 
+        // 👉 Không cần thiết nhưng bé đang dùng
         public string PaymentMethod { get; set; }
         public string PaymentImageUrl { get; set; }
-        public decimal TicketTotal { get; set; } // ✅ chỉ tính tổng tiền vé
-
+        public decimal TicketTotal { get; set; }
     }
 }

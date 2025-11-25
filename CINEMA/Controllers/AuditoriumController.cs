@@ -106,13 +106,44 @@ namespace CINEMA.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
-            var auditorium = _context.Auditoriums.Find(id);
-            if (auditorium != null)
+            var auditorium = _context.Auditoriums
+                .Include(a => a.Seats)
+                .Include(a => a.Showtimes)
+                    .ThenInclude(s => s.Tickets)
+                .FirstOrDefault(a => a.AuditoriumId == id);
+
+            if (auditorium == null)
+                return NotFound();
+
+            // 1️⃣ XÓA vé trước
+            foreach (var showtime in auditorium.Showtimes)
             {
-                _context.Auditoriums.Remove(auditorium);
-                _context.SaveChanges();
+                if (showtime.Tickets.Any())
+                    _context.Tickets.RemoveRange(showtime.Tickets);
             }
+            _context.SaveChanges();  // ⚡ BẮT BUỘC
+
+            // 2️⃣ XÓA suất chiếu
+            if (auditorium.Showtimes.Any())
+            {
+                _context.Showtimes.RemoveRange(auditorium.Showtimes);
+                _context.SaveChanges();   // ⚡ BẮT BUỘC
+            }
+
+            // 3️⃣ XÓA ghế
+            if (auditorium.Seats.Any())
+            {
+                _context.Seats.RemoveRange(auditorium.Seats);
+                _context.SaveChanges();   // ⚡ BẮT BUỘC
+            }
+
+            // 4️⃣ XÓA phòng chiếu
+            _context.Auditoriums.Remove(auditorium);
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "🗑️ Đã xóa phòng chiếu và toàn bộ dữ liệu liên quan.";
             return RedirectToAction(nameof(Index));
         }
+
     }
 }

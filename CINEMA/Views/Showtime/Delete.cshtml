@@ -1,28 +1,63 @@
 ﻿@model CINEMA.Models.Showtime
+
 @{
     ViewData["Title"] = "Xóa lịch chiếu";
     Layout = "_AdminLayout";
 }
 
 <div class="container mt-4">
-    <h2 class="text-danger">🗑 Xóa lịch chiếu</h2>
-    <h5>Bé có chắc chắn muốn xóa lịch chiếu này không?</h5>
+    <h2 class="fw-bold text-danger mb-3">🗑 Xóa lịch chiếu</h2>
 
-    <div class="card mt-3">
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        Bé có chắc chắn muốn xóa lịch chiếu này không?
+    </div>
+
+    <div class="card shadow-sm">
         <div class="card-body">
-            <p><strong>Phim:</strong> @Model.Movie?.Title</p>
-            <p><strong>Rạp:</strong> @Model.Auditorium?.Name</p>
-            <p><strong>Bắt đầu:</strong> @Model.StartTime?.ToString("dd/MM/yyyy HH:mm")</p>
-            <p><strong>Kết thúc:</strong> @Model.EndTime?.ToString("dd/MM/yyyy HH:mm")</p>
-            <p><strong>Giá vé:</strong> @Model.BasePrice?.ToString("N0") đ</p>
-            <p><strong>Ngôn ngữ:</strong> @Model.Language</p>
-            <p><strong>Trạng thái:</strong> @(Model.IsActive == true ? "Đang chiếu" : "Ngưng")</p>
+
+            <p><strong>🎬 Phim:</strong> @Model.Movie?.Title</p>
+
+            <p><strong>🏛 Phòng chiếu:</strong> @Model.Auditorium?.Name</p>
+
+            <p>
+                <strong>⏰ Bắt đầu:</strong>
+                @Model.StartTime?.ToString("dd/MM/yyyy HH:mm")
+            </p>
+
+            <p>
+                <strong>⏰ Kết thúc:</strong>
+                @Model.EndTime?.ToString("dd/MM/yyyy HH:mm")
+            </p>
+
+            <p>
+                <strong>💵 Giá vé:</strong>
+                @Model.BasePrice?.ToString("N0") đ
+            </p>
+
+            <p><strong>🌐 Ngôn ngữ:</strong> @Model.Language</p>
+
+            <p>
+                <strong>📌 Trạng thái:</strong>
+                @(Model.IsActive == true ? "Đang chiếu" : "Đã ngưng")
+            </p>
+
         </div>
     </div>
 
-    <form asp-action="Delete" method="post" class="mt-3">
-        <input type="hidden" asp-for="ShowtimeId" />
-        <button type="submit" class="btn btn-danger">✅ Xác nhận xóa</button>
-        <a asp-action="Index" class="btn btn-secondary">⬅ Hủy</a>
+    <form asp-controller="Showtime"
+          asp-action="DeleteConfirmed"
+          asp-route-id="@Model.ShowtimeId"
+          method="post"
+          class="mt-4">
+
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Xác nhận xóa
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary ms-2">
+            <i class="bi bi-arrow-left"></i> Quay lại
+        </a>
     </form>
+
 </div>

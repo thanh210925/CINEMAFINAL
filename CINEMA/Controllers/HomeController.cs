@@ -19,12 +19,13 @@ namespace CINEMA.Controllers
         // ================== TRANG CHỦ ==================
         public IActionResult Index()
         {
-            var movies = _context.Movies.ToList();
+            // ❗ Chỉ lấy phim đang chiếu (IsActive = true)
+            var movies = _context.Movies
+                .Where(m => m.IsActive == true)
+                .ToList();
 
-            // ✅ Lấy ngày hôm nay dưới dạng DateOnly để so với ReleaseDate (DateOnly?)
             var today = DateOnly.FromDateTime(DateTime.Today);
 
-            // ✅ Phim sắp chiếu: còn active, có ReleaseDate, và ReleaseDate > hôm nay
             var comingSoon = _context.Movies
                 .Where(m => m.IsActive == true
                             && m.ReleaseDate.HasValue
@@ -32,7 +33,6 @@ namespace CINEMA.Controllers
                 .OrderBy(m => m.ReleaseDate)
                 .ToList();
 
-            // 🔹 Danh sách rạp
             var theaters = _context.Theaters
                 .OrderBy(t => t.Name)
                 .ToList();

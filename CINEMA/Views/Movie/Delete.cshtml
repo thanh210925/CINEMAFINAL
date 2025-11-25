@@ -1,13 +1,100 @@
 ﻿@model CINEMA.Models.Movie
+@{
+    ViewData["Title"] = "Xóa phim";
+    Layout = "_AdminLayout";
+}
 
-<h3>Bạn có chắc chắn muốn xóa phim này không?</h3>
-<div>
-    <h4>@Model.Title</h4>
-    <p>@Model.Description</p>
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-danger text-white d-flex justify-content-between">
+            <h4 class="mb-0">🗑️ Xóa Phim</h4>
+        </div>
 
-    <form asp-action="Delete" method="post">
-        <input type="hidden" asp-for="MovieId" />
-        <button type="submit" class="btn btn-danger">Xóa</button>
-        <a asp-action="Index" class="btn btn-secondary">Hủy</a>
-    </form>
+        <div class="card-body">
+            <h5 class="fw-bold text-danger">@Model.Title</h5>
+            <p class="text-muted">@Model.Description</p>
+
+            <div class="mb-3">
+                <label class="fw-bold">🎬 Thông tin phim:</label>
+                <ul>
+                    <li><b>Thời lượng:</b> @Model.Duration phút</li>
+                    <li><b>Ngày khởi chiếu:</b> @Model.ReleaseDate?.ToString("dd/MM/yyyy")</li>
+                    <li><b>Trạng thái:</b> @(Model.IsActive == true ? "Đang chiếu" : "Ngưng chiếu")</li>
+                </ul>
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold">📅 Số suất chiếu liên quan:</label>
+                <p class="text-muted">
+                    @Model.Showtimes?.Count() suất chiếu sẽ bị xoá kèm theo.
+                </p>
+            </div>
+
+            <!-- ===================== NÚT MỞ MODAL ====================== -->
+            <button class="btn btn-danger px-4" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                <i class="bi bi-trash"></i> Xóa phim này
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary px-4">
+                <i class="bi bi-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
 </div>
+
+<!-- ===================== MODAL XÁC NHẬN ====================== -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold">Xác nhận xóa</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body fs-5">
+                Bé có chắc chắn muốn xóa phim
+                <strong class="text-danger">@Model.Title</strong> không?
+                <br />
+                <b>Toàn bộ suất chiếu và vé liên quan cũng sẽ bị xóa.</b>
+            </div>
+
+            <div class="modal-footer">
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="MovieId" />
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Hủy
+                    </button>
+
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-check-circle"></i> Xóa luôn
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .modal-content {
+            border-radius: 1rem;
+        }
+
+        .modal-header {
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            border: none;
+        }
+
+            .btn-danger:hover {
+                background: linear-gradient(135deg, #b91c1c, #dc2626);
+            }
+    </style>
+}

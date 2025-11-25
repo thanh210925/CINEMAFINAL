@@ -30,7 +30,17 @@
                     <h5 class="fw-bold text-primary mb-3">@Model.MovieTitle</h5>
                     <p><strong>Suất chiếu:</strong> @Model.Showtime</p>
                     <p><strong>Phòng chiếu:</strong> @Model.Auditorium</p>
-                    <p><strong>Ghế đã chọn:</strong> @string.Join(", ", Model.SelectedSeats)</p>
+                    <p><strong>Rạp chiếu:</strong> @Model.TheaterName</p>
+                    <p><strong>Địa điểm rạp:</strong> @Model.TheaterAddress</p>
+                    <p><strong>Hotline rạp:</strong> @Model.TheaterPhone</p>
+
+                    <p>
+                        <strong>Ghế đã chọn:</strong>
+                        @(Model.SelectedSeats != null && Model.SelectedSeats.Any()
+                                                ? string.Join(", ", Model.SelectedSeats)
+                                                : "Không có")
+                    </p>
+
                     <hr />
                     <h6>Loại vé</h6>
                     <ul class="list-group list-group-flush mb-3">

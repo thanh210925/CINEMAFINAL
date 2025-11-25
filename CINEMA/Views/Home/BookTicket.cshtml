@@ -274,61 +274,100 @@
     box-shadow: 0 0 10px rgba(13,110,253,0.6);
 }
 </style>
-
 @section Scripts {
-<script>
-function calcTotal() {
-    const basePrice = parseFloat(document.getElementById("basePrice").value) || 0;
-    let adult = parseInt(document.getElementsByName("AdultTickets")[0].value) || 0;
-    let child = parseInt(document.getElementsByName("ChildTickets")[0].value) || 0;
-    let student = parseInt(document.getElementsByName("StudentTickets")[0].value) || 0;
-    let total = adult * basePrice + child * (basePrice * 0.7) + student * (basePrice * 0.8);
+    <script>
+        function calcTotal() {
+            const basePrice = parseFloat(document.getElementById("basePrice").value) || 0;
+            let adult = parseInt(document.getElementsByName("AdultTickets")[0].value) || 0;
+            let child = parseInt(document.getElementsByName("ChildTickets")[0].value) || 0;
+            let student = parseInt(document.getElementsByName("StudentTickets")[0].value) || 0;
+            let total = adult * basePrice + child * (basePrice * 0.7) + student * (basePrice * 0.8);
 
-    document.querySelectorAll(".combo-input").forEach(el => {
-        let qty = parseInt(el.value) || 0;
-        let price = parseFloat(el.dataset.price) || 0;
-        total += qty * price;
-    });
+            document.querySelectorAll(".combo-input").forEach(el => {
+                let qty = parseInt(el.value) || 0;
+                let price = parseFloat(el.dataset.price) || 0;
+                total += qty * price;
+            });
 
-    document.getElementById("totalPrice").innerText = total.toLocaleString("vi-VN");
-    document.getElementById("TotalPriceHidden").value = total;
-}
+            document.getElementById("totalPrice").innerText = total.toLocaleString("vi-VN");
+            document.getElementById("TotalPriceHidden").value = total;
+        }
 
-function limitSeats() {
-    let adult = parseInt(document.getElementsByName("AdultTickets")[0].value) || 0;
-    let child = parseInt(document.getElementsByName("ChildTickets")[0].value) || 0;
-    let student = parseInt(document.getElementsByName("StudentTickets")[0].value) || 0;
-    let maxSeats = adult + child + student;
-    let checkedSeats = document.querySelectorAll(".seat-checkbox:checked");
-    if (checkedSeats.length > maxSeats) {
-        alert("Bạn chỉ được chọn " + maxSeats + " ghế theo số vé đã chọn!");
-        checkedSeats[checkedSeats.length - 1].checked = false;
-    }
-}
+        function getMaxSeats() {
+            let adult = parseInt(document.getElementsByName("AdultTickets")[0].value) || 0;
+            let child = parseInt(document.getElementsByName("ChildTickets")[0].value) || 0;
+            let student = parseInt(document.getElementsByName("StudentTickets")[0].value) || 0;
+            return adult + child + student;
+        }
 
-document.querySelectorAll(".seat-checkbox").forEach(cb => {
-    cb.addEventListener("change", function () {
-        const badge = this.nextElementSibling;
-        badge.classList.toggle("bg-success", this.checked);
-        badge.classList.toggle("bg-secondary", !this.checked);
-        limitSeats();
+        function limitSeats() {
+            let maxSeats = getMaxSeats();
+            let checked = document.querySelectorAll(".seat-checkbox:checked");
+
+            if (maxSeats === 0) {
+                alert("Bạn phải chọn số lượng vé trước khi chọn ghế!");
+                checked.forEach(cb => cb.checked = false);
+                document.querySelectorAll(".seat-badge.bg-success")
+                    .forEach(b => b.classList.remove("bg-success"));
+                return;
+            }
+
+            if (checked.length > maxSeats) {
+                alert("Bạn chỉ được chọn đúng " + maxSeats + " ghế theo số vé!");
+                checked[checked.length - 1].checked = false;
+                return;
+            }
+        }
+
+        // ================== GHẾ ===================
+        document.querySelectorAll(".seat-checkbox").forEach(cb => {
+            cb.addEventListener("change", function () {
+
+                let maxSeats = getMaxSeats();
+                if (maxSeats === 0) {
+                    this.checked = false;
+                    alert("Vui lòng chọn số lượng vé trước!");
+                    return;
+                }
+
+                limitSeats();
+
+                const badge = this.nextElementSibling;
+                badge.classList.toggle("bg-success", this.checked);
+                badge.classList.toggle("bg-secondary", !this.checked);
+
+                calcTotal();
+            });
+        });
+
+        // ================== TÍNH TIỀN ===================
+        document.querySelectorAll(".ticket-input, .combo-input").forEach(el => {
+            el.addEventListener("input", function () {
+                // reset ghế khi đổi số vé
+                document.querySelectorAll(".seat-checkbox").forEach(cb => {
+                    cb.checked = false;
+                });
+                document.querySelectorAll(".seat-badge").forEach(badge => {
+                    if (!badge.classList.contains("bg-danger")) {
+                        badge.classList.remove("bg-success");
+                        badge.classList.add("bg-secondary");
+                    }
+                });
+
+                calcTotal();
+            });
+        });
+
+        // ================== COUNTDOWN ===================
+        let timeLeft = 600;
+        setInterval(() => {
+            if (timeLeft <= 0) return;
+            timeLeft--;
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById("countdown").innerText = `${m}:${s.toString().padStart(2, '0')}`;
+        }, 1000);
+
         calcTotal();
-    });
-});
-
-document.querySelectorAll(".ticket-input, .combo-input").forEach(el => {
-    el.addEventListener("input", calcTotal);
-});
-
-let timeLeft = 600;
-setInterval(() => {
-    if (timeLeft <= 0) return;
-    timeLeft--;
-    let m = Math.floor(timeLeft / 60);
-    let s = timeLeft % 60;
-    document.getElementById("countdown").innerText = `${m}:${s.toString().padStart(2, '0')}`;
-}, 1000);
-
-calcTotal();
-</script>
+    </script>
 }

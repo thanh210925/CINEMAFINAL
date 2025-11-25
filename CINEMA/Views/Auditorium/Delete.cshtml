@@ -31,7 +31,7 @@
                 <dd class="col-sm-9">@Model.ScreenType</dd>
             </dl>
 
-            <form asp-action="DeleteConfirmed" method="post">
+            <form asp-action="Delete" method="post">
                 <input type="hidden" asp-for="AuditoriumId" />
                 <div class="text-end">
                     <button type="submit" class="btn btn-danger px-4">
@@ -40,6 +40,7 @@
                     <a asp-action="Index" class="btn btn-secondary">Hủy</a>
                 </div>
             </form>
+
         </div>
     </div>
 </div>
